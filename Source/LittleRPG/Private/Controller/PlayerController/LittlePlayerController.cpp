@@ -6,6 +6,7 @@
 #include "InputCoreTypes.h"
 #include "Character/LittlePlayerCharacter.h"
 #include "Component/StatComponent/LittleStatComponent.h"
+#include "HUD/LittleHUD.h"
 
 ALittlePlayerController::ALittlePlayerController()
 {
@@ -56,6 +57,12 @@ void ALittlePlayerController::SetupInputComponent()
 	ETriggerEvent::Triggered,
 	this,
 	&ALittlePlayerController::TestDamage);
+	
+	EnhancedInput->BindAction(
+		InventoryAction,
+		ETriggerEvent::Triggered,
+		this,
+		&ALittlePlayerController::HandleInventory);
 }
 
 void ALittlePlayerController::Move(const FInputActionValue& Value)
@@ -87,6 +94,15 @@ void ALittlePlayerController::Look(const FInputActionValue& Value)
 
 	AddYawInput(LookAxisVector.X);
 	AddPitchInput(-LookAxisVector.Y);
+}
+
+void ALittlePlayerController::HandleInventory(const FInputActionValue& Value)
+{
+	ALittleHUD* LittleHUD = Cast<ALittleHUD>(GetHUD());
+	if (!LittleHUD)
+		return;
+	
+	LittleHUD->ToggleInventory();
 }
 
 void ALittlePlayerController::TestDamage()

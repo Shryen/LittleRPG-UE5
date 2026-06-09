@@ -14,6 +14,8 @@ class LITTLERPG_API ALittlePlayerState : public APlayerState
 	GENERATED_BODY()
 	
 public:
+	ALittlePlayerState();
+	
 	FOnInventoryChanged OnInventoryChanged;
 	
 	const TArray<TObjectPtr<UItemData>>& GetInventory() const {return Inventory;};
@@ -22,6 +24,8 @@ public:
 	
 	void PrintInventory();
 protected:
-	UPROPERTY(VisibleAnywhere)
-	TArray<TObjectPtr<UItemData>> Inventory;  
+	void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	
+	UPROPERTY(VisibleAnywhere, Replicated)
+	TArray<TObjectPtr<UItemData>> Inventory;
 };

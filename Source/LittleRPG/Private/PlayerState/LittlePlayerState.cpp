@@ -3,6 +3,12 @@
 #include "PlayerState/LittlePlayerState.h"
 
 #include "Data/ItemData.h"
+#include "Net/UnrealNetwork.h"
+
+ALittlePlayerState::ALittlePlayerState()
+{
+	bReplicates = true;
+}
 
 void ALittlePlayerState::AddItem(UItemData* Item)
 {
@@ -10,6 +16,9 @@ void ALittlePlayerState::AddItem(UItemData* Item)
 	{
 		return;
 	}
+	
+	if (!HasAuthority())
+		return;
 	
 	Inventory.Add(Item);
 	OnInventoryChanged.Broadcast();
@@ -23,8 +32,21 @@ void ALittlePlayerState::PrintInventory()
 		return;
 	}
 	
+	if (!HasAuthority())
+		return;
+	
 	for (const UItemData* Item : Inventory)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Item Name: %s"), *Item->ItemName.ToString());
+		UE_LOG(LogTemp, Warning, 
+			TEXT("Item Name in Inventory: %s for Player: %s"), 
+			*Item->ItemName.ToString(),
+			*GetPlayerController()->GetName());
 	}
+}
+
+void ALittlePlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	
+	DOREPLIFETIME(ALittlePlayerState, Inventory);
 }
