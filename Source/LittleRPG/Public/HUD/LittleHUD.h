@@ -19,7 +19,9 @@ public:
 	
 protected:
 	virtual void BeginPlay() override;
-	
+	void PopulateInventory() const;
+	void OnPlayerStateReady();
+
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 	TSubclassOf<UInventoryWidget> InventoryWidgetClass;
 	

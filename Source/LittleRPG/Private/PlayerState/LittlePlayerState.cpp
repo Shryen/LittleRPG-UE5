@@ -13,9 +13,7 @@ ALittlePlayerState::ALittlePlayerState()
 void ALittlePlayerState::AddItem(UItemData* Item)
 {
 	if (!Item)
-	{
 		return;
-	}
 	
 	if (!HasAuthority())
 		return;
@@ -49,4 +47,9 @@ void ALittlePlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProper
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	
 	DOREPLIFETIME(ALittlePlayerState, Inventory);
+}
+
+void ALittlePlayerState::OnRep_Inventory() const
+{
+	OnInventoryChanged.Broadcast();
 }

@@ -28,7 +28,19 @@ void ALittleBaseCharacter::BeginPlay()
 	LittleStatComponent->OnStatChanged.AddDynamic(this, &ALittleBaseCharacter::HandleStatChanged);
 }
 
-void ALittleBaseCharacter::HandleStatChanged(float NewStat)
+void ALittleBaseCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+	OnPlayerStateReady.Broadcast();
+}
+
+void ALittleBaseCharacter::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+	OnPlayerStateReady.Broadcast();
+}
+
+void ALittleBaseCharacter::HandleStatChanged(float NewStat) const
 {
 	if (IsLocallyControlled())
 	{

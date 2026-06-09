@@ -26,6 +26,9 @@ public:
 protected:
 	void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	
-	UPROPERTY(VisibleAnywhere, Replicated)
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Inventory)
 	TArray<TObjectPtr<UItemData>> Inventory;
+	
+	UFUNCTION()
+	void OnRep_Inventory() const;
 };
