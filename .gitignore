@@ -1,0 +1,44 @@
+# Ignore everything by default
+*
+
+# But allow these directories and files
+!.gitignore
+!*.cpp
+!*.h
+!*.hpp
+!*.c
+!*.cc
+!*.cxx
+
+# Allow Source directory structure
+!Source/
+!Source/**/
+!Source/**/*.cpp
+!Source/**/*.h
+!Source/**/*.hpp
+
+# Allow Config files (project settings)
+!Config/
+!Config/**/
+!Config/**/*.ini
+
+# Allow uproject file
+!*.uproject
+
+# Allow uplugin files if you have plugins
+!*.uplugin
+
+# Allow Build.cs and Target.cs files (build configuration)
+!*.Build.cs
+!*.Target.cs
+
+# Optionally allow content structure if you want to track blueprint references
+# Uncomment these lines if needed:
+# !Content/
+# !Content/**/
+
+# Optionally allow plugin structure
+# !Plugins/
+# !Plugins/**/
+# !Plugins/**/*.cpp
+# !Plugins/**/*.h
