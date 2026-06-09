@@ -49,7 +49,7 @@ void ALittlePlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProper
 	DOREPLIFETIME(ALittlePlayerState, Inventory);
 }
 
-void ALittlePlayerState::OnRep_Inventory() const
+void ALittlePlayerState::OnRep_Inventory()
 {
 	OnInventoryChanged.Broadcast();
 }

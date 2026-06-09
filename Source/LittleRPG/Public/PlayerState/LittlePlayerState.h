@@ -30,5 +30,5 @@ protected:
 	TArray<TObjectPtr<UItemData>> Inventory;
 	
 	UFUNCTION()
-	void OnRep_Inventory() const;
+	void OnRep_Inventory();
 };
