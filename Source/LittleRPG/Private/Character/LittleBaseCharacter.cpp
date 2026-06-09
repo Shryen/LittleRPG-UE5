@@ -40,7 +40,7 @@ void ALittleBaseCharacter::OnRep_PlayerState()
 	OnPlayerStateReady.Broadcast();
 }
 
-void ALittleBaseCharacter::HandleStatChanged(float NewStat) const
+void ALittleBaseCharacter::HandleStatChanged(float NewStat)
 {
 	if (IsLocallyControlled())
 	{

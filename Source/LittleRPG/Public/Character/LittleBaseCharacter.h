@@ -30,5 +30,5 @@ private:
 	TObjectPtr<ULittleStatComponent> LittleStatComponent;
 	
 	UFUNCTION()
-	void HandleStatChanged(float NewStat) const;
+	void HandleStatChanged(float NewStat);
 };
