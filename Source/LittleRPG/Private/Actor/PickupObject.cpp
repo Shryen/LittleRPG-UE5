@@ -36,10 +36,6 @@ void APickupObject::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Green,
-		FString::Printf(TEXT("Pickup BeginPlay - %s"),
-			HasAuthority() ? TEXT("SERVER") : TEXT("CLIENT")));
-
 	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &APickupObject::OnOverlap);
 	InitialLocation = GetActorLocation();
 }
@@ -47,15 +43,7 @@ void APickupObject::BeginPlay()
 void APickupObject::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
-	GEngine->AddOnScreenDebugMessage(
-		-1,  
-		0.f, 
-		HasAuthority() ? FColor::Green : FColor::Red,
-		FString::Printf(TEXT("Pickup Tick - %s"), 
-			HasAuthority() ? TEXT("SERVER") : TEXT("CLIENT"))
-	);
-
+	
 	if (!HasAuthority())
 		return;
 

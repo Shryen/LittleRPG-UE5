@@ -57,7 +57,7 @@ void UInventoryWidgetController::PopulateInventory() const
 			UE_LOG(LogTemp, Warning, TEXT("UInventoryWidgetController::PopulateInventory — null item in inventory, skipping"));
 			continue; 
 		}
-		InventoryWidget->AddItem(Item->ItemName);
+		InventoryWidget->AddItem(Item);
 	}
 }
 

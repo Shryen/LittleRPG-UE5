@@ -5,6 +5,8 @@
 #include "InventoryWidget.generated.h"
 
 
+class UInventoryItemWidget;
+class UItemData;
 class UUniformGridPanel;
 class UHorizontalBox;
 
@@ -14,7 +16,7 @@ class LITTLERPG_API UInventoryWidget : public ULittleUserWidget
 	GENERATED_BODY()
 	
 public:
-	void AddItem(const FText& ItemName);
+	void AddItem(const UItemData* Item);
 	void ClearItems();
 
 protected:
@@ -23,4 +25,10 @@ protected:
 	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UUniformGridPanel> InventoryGridPanel;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "LittleRPG|Inventory")
+	TSubclassOf<UInventoryItemWidget> InventoryItemWidgetClass;
+	
+private:
+	int32 ColumnCount = 8;
 };

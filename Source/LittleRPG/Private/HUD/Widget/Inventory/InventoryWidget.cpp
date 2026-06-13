@@ -1,17 +1,23 @@
 ﻿#include "HUD/Widget/Inventory/InventoryWidget.h"
-
 #include "Components/TextBlock.h"
 #include "Components/UniformGridPanel.h"
+#include "HUD/Widget/Inventory/InventoryItemWidget.h"
 
-void UInventoryWidget::AddItem(const FText& ItemName)
+void UInventoryWidget::AddItem(const UItemData* Item)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Trying to add text to inventory widget"));
-	if (!InventoryGridPanel) return;
-
-	UTextBlock* Text = NewObject<UTextBlock>(this);
-	Text->SetText(ItemName);
-	InventoryGridPanel->AddChild(Text);
-	UE_LOG(LogTemp, Warning, TEXT("Widget added successfully"));
+	if (!InventoryGridPanel || !InventoryItemWidgetClass) return;
+	
+	UInventoryItemWidget* ItemWidget = CreateWidget<UInventoryItemWidget>(this, InventoryItemWidgetClass);
+	if (!ItemWidget) return;
+	
+	int32 Index = InventoryGridPanel->GetChildrenCount();
+	int32 Column = Index % ColumnCount;
+	int32 Row = Index / ColumnCount;
+	
+    ItemWidget->SetItemData(Item);
+    InventoryGridPanel->AddChildToUniformGrid(ItemWidget, Row, Column);
+	UE_LOG(LogTemp, Warning, TEXT("Widget added successfully at Row: %d Column: %d"), Row, Column);
 }
 
 void UInventoryWidget::ClearItems()
