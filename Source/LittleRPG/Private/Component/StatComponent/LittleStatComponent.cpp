@@ -15,7 +15,7 @@ ULittleStatComponent::ULittleStatComponent()
 void ULittleStatComponent::ServerTakeDamage_Implementation(float Damage)
 {
 	Health = FMath::Max(0.f, Health - Damage);
-	OnStatChanged.Broadcast(Health);
+	OnHealthChanged.Broadcast(Health);
 }
 
 void ULittleStatComponent::BeginPlay()
@@ -34,12 +34,12 @@ void ULittleStatComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProp
 
 void ULittleStatComponent::OnRep_Health() const
 {
-	OnStatChanged.Broadcast(Health);
+	OnHealthChanged.Broadcast(Health);
 }
 
 
 void ULittleStatComponent::OnRep_MaxHealth() const
 {
-	OnStatChanged.Broadcast(MaxHealth);
+	OnHealthChanged.Broadcast(MaxHealth);
 }
 

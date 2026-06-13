@@ -25,7 +25,7 @@ ALittleBaseCharacter::ALittleBaseCharacter()
 void ALittleBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	LittleStatComponent->OnStatChanged.AddDynamic(this, &ALittleBaseCharacter::HandleStatChanged);
+	LittleStatComponent->OnHealthChanged.AddDynamic(this, &ALittleBaseCharacter::HandleStatChanged);
 }
 
 void ALittleBaseCharacter::PossessedBy(AController* NewController)

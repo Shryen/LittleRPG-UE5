@@ -7,6 +7,7 @@
 #include "Character/LittlePlayerCharacter.h"
 #include "Component/StatComponent/LittleStatComponent.h"
 #include "HUD/LittleHUD.h"
+#include "HUD/Widget/Inventory/InventoryWidgetController.h"
 
 ALittlePlayerController::ALittlePlayerController()
 {
@@ -102,7 +103,7 @@ void ALittlePlayerController::HandleInventory(const FInputActionValue& Value)
 	if (!LittleHUD)
 		return;
 	
-	LittleHUD->ToggleInventory();
+	LittleHUD->GetInventoryWidgetController()->ToggleInventory();
 }
 
 void ALittlePlayerController::TestDamage()

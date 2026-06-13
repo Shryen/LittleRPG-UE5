@@ -4,7 +4,7 @@
 #include "Components/ActorComponent.h"
 #include "LittleStatComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStatChangedSignature, float, NewStat);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthChangedSignature, float, NewHealth);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class LITTLERPG_API ULittleStatComponent : public UActorComponent
@@ -17,8 +17,13 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerTakeDamage(float Damage);
 	
+	UFUNCTION(BlueprintCallable)
+	float GetMaxHealth() const { return MaxHealth; }
+	UFUNCTION(BlueprintCallable)
+	float GetCurrentHealth() const { return Health; }
+	
 	UPROPERTY(BlueprintAssignable)
-	FOnStatChangedSignature OnStatChanged;
+	FOnHealthChangedSignature OnHealthChanged;
 	
 protected:
 	virtual void BeginPlay() override;
