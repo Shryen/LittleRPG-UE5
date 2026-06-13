@@ -4,9 +4,15 @@
 #include "HUD/Widget/Inventory/InventoryWidget.h"
 #include "PlayerState/LittlePlayerState.h"
 
-void UInventoryWidgetController::SetWidget(UInventoryWidget* InWidget)
+void UInventoryWidgetController::SetWidget(ULittleUserWidget* InWidget)
 {
-	InventoryWidget = InWidget;
+	Super::SetWidget(InWidget);
+	InventoryWidget = Cast<UInventoryWidget>(InWidget);
+	if (!InventoryWidget)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UInventoryWidgetController::SetWidget: Cast to UInventoryWidget failed!"));
+		return;
+	}
 	InventoryWidget->SetVisibility(ESlateVisibility::Collapsed);
 }
 
@@ -51,9 +57,9 @@ void UInventoryWidgetController::PopulateInventory() const
 	}
 }
 
-void UInventoryWidgetController::BindPlayerStateToInventory(APlayerState* InPlayerState)
+void UInventoryWidgetController::BindPlayerStateToInventory()
 {
-	ALittlePlayerState* PS = Cast<ALittlePlayerState>(InPlayerState);
+	ALittlePlayerState* PS = Cast<ALittlePlayerState>(PlayerState);
 	if(!PS)
 		return;
 	

@@ -25,7 +25,7 @@ ALittleBaseCharacter::ALittleBaseCharacter()
 void ALittleBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	LittleStatComponent->OnHealthChanged.AddDynamic(this, &ALittleBaseCharacter::HandleStatChanged);
+	LittleStatComponent->OnStatChanged.AddDynamic(this, &ALittleBaseCharacter::HandleStatChanged);
 }
 
 void ALittleBaseCharacter::PossessedBy(AController* NewController)
@@ -40,7 +40,7 @@ void ALittleBaseCharacter::OnRep_PlayerState()
 	OnPlayerStateReady.Broadcast();
 }
 
-void ALittleBaseCharacter::HandleStatChanged(float NewStat)
+void ALittleBaseCharacter::HandleStatChanged(EAttribute StatType, float NewStat)
 {
 	if (IsLocallyControlled())
 	{

@@ -2,9 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "Widget/LittleWidgetController.h"
 #include "LittleHUD.generated.h"
 
 
+class UHealthBarWidgetController;
 class UMainLayoutWidget;
 class UInventoryWidgetController;
 class ULittleWidgetController;
@@ -19,20 +21,15 @@ class LITTLERPG_API ALittleHUD : public AHUD
 
 public:
 	UInventoryWidgetController* GetInventoryWidgetController() const { return InventoryWidgetController; }
-
+	UHealthBarWidgetController* GetHealthBarWidgetController() const { return HealthBarWidgetController; }
 	
 protected:
+	bool SetupMainOverlayWidget(APlayerController* PC);
+	void SetupInventoryWidgetController(FWidgetControllerParams Params);
+	void SetupHealthBarWidgetController(FWidgetControllerParams Params);
+	void SetupPlayerStateDependencies();
 	virtual void BeginPlay() override;
 	void OnPlayerStateReady();
-	
-	UFUNCTION()
-	void OnHealthChanged(float CurrentHealth);
-
-	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
-	TSubclassOf<UInventoryWidget> InventoryWidgetClass;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
-	TSubclassOf<UHealthWidget> HealthBarWidgetClass;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 	TSubclassOf<ULittleUserWidget> MainOverlayWidgetClass;
@@ -42,12 +39,8 @@ private:
 	TObjectPtr<UInventoryWidgetController> InventoryWidgetController;
 	
 	UPROPERTY()
-	TObjectPtr<UInventoryWidget> InventoryWidget;
-	
-	UPROPERTY()
-	TObjectPtr<UHealthWidget> HealthBarWidget;
+	TObjectPtr<UHealthBarWidgetController> HealthBarWidgetController;
 	
 	UPROPERTY()
 	TObjectPtr<UMainLayoutWidget> MainOverlayWidget;
-	
 };

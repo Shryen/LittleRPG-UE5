@@ -4,7 +4,14 @@
 #include "Components/ActorComponent.h"
 #include "LittleStatComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthChangedSignature, float, NewHealth);
+UENUM(BlueprintType)
+enum class EAttribute : uint8
+{
+	Health,
+	MaxHealth,
+};
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStatChanged, EAttribute, StatType, float, NewValue);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class LITTLERPG_API ULittleStatComponent : public UActorComponent
@@ -23,13 +30,12 @@ public:
 	float GetCurrentHealth() const { return Health; }
 	
 	UPROPERTY(BlueprintAssignable)
-	FOnHealthChangedSignature OnHealthChanged;
+	FOnStatChanged OnStatChanged;
 	
-protected:
 	virtual void BeginPlay() override;
 	
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
-
+	
 private:
 	UPROPERTY(ReplicatedUsing = OnRep_Health, EditDefaultsOnly)
 	float Health{0};

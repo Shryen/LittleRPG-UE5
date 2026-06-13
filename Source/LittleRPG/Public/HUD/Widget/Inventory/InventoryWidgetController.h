@@ -12,12 +12,11 @@ class LITTLERPG_API UInventoryWidgetController : public ULittleWidgetController
 {
 	GENERATED_BODY()
 public:
-	void SetWidget(UInventoryWidget* InWidget);
+	virtual void SetWidget(ULittleUserWidget* InWidget) override;
 	UFUNCTION(BlueprintCallable)
 	void ToggleInventory();
 	
-	
-	void BindPlayerStateToInventory(APlayerState* InPlayerState);
+	void BindPlayerStateToInventory();
 
 private:
 	UPROPERTY()

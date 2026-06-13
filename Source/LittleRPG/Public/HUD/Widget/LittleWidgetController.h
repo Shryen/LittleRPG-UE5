@@ -4,6 +4,7 @@
 #include "UObject/Object.h"
 #include "LittleWidgetController.generated.h"
 
+class ULittleUserWidget;
 class ULittleStatComponent;
 
 USTRUCT(BlueprintType)
@@ -32,6 +33,9 @@ class LITTLERPG_API ULittleWidgetController : public UObject
 public:
 	UFUNCTION(BlueprintCallable)
 	void SetWidgetControllerParams(const FWidgetControllerParams& Params);
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void SetWidget(ULittleUserWidget* InWidget);
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "LittleRPG|Widget|Controller")
 	TObjectPtr<APlayerController> PlayerController;
@@ -41,4 +45,7 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly, Category = "LittleRPG|Widget|Controller")
 	TObjectPtr<ULittleStatComponent> StatComponent;
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<ULittleUserWidget> OwnerWidget;
 };

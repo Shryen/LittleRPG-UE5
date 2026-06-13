@@ -4,6 +4,7 @@
 #include "GameFramework/Character.h"
 #include "LittleBaseCharacter.generated.h"
 
+enum class EAttribute : uint8;
 class ULittleStatComponent;
 
 DECLARE_MULTICAST_DELEGATE(FOnPlayerStateReadySignature)
@@ -30,5 +31,5 @@ private:
 	TObjectPtr<ULittleStatComponent> LittleStatComponent;
 	
 	UFUNCTION()
-	void HandleStatChanged(float NewStat);
+	void HandleStatChanged(EAttribute StaType, float NewStat);
 };

@@ -13,6 +13,11 @@ class LITTLERPG_API UHealthWidget : public ULittleUserWidget
 	
 public:
 	void UpdateHealth(float CurrentHealth, float MaxHealth);
+	UProgressBar* GetHealthProgressBar() const {   
+		if (!HealthBar)
+		UE_LOG(LogTemp, Warning, TEXT("UHealthWidget: HealthBar BindWidget is null — check name matches Blueprint!"));
+		return HealthBar; 
+	} 
 private:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UProgressBar> HealthBar;

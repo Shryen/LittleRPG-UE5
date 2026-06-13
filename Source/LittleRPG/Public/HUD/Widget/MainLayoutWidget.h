@@ -5,6 +5,7 @@
 #include "LittleUserWidget.h"
 #include "MainLayoutWidget.generated.h"
 
+class UHealthWidget;
 class UInventoryWidget;
 
 UCLASS()
@@ -15,4 +16,7 @@ class LITTLERPG_API UMainLayoutWidget : public ULittleUserWidget
 public:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UInventoryWidget> InventoryWidget;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UHealthWidget> HealthBarWidget;
 };
