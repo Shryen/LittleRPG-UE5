@@ -1,8 +1,6 @@
 ﻿#include "HUD/LittleHUD.h"
-
 #include "Character/LittleBaseCharacter.h"
 #include "Component/StatComponent/LittleStatComponent.h"
-#include "Data/ItemData.h"
 #include "HUD/Widget/LittleWidgetController.h"
 #include "HUD/Widget/MainLayoutWidget.h"
 #include "HUD/Widget/Inventory/InventoryWidget.h"
