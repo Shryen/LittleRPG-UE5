@@ -42,7 +42,11 @@ void UInventoryWidgetController::HideInventoryWidget()
 void UInventoryWidgetController::PopulateInventory() const
 {
 	ALittlePlayerState* PS = Cast<ALittlePlayerState>(PlayerState);
-	if (!PS || !InventoryWidget) return;
+	if (!PS || !InventoryWidget)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UInventoryWidgetController::PopulateInventory: Cast to UInventoryWidget failed!"));
+		return;
+	};
 
 	InventoryWidget->ClearItems();
 	
@@ -50,16 +54,16 @@ void UInventoryWidgetController::PopulateInventory() const
 	{
 		if (!Item)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ALittleHUD::PopulateInventory — null item in inventory, skipping"));
+			UE_LOG(LogTemp, Warning, TEXT("UInventoryWidgetController::PopulateInventory — null item in inventory, skipping"));
 			continue; 
 		}
 		InventoryWidget->AddItem(Item->ItemName);
 	}
 }
 
-void UInventoryWidgetController::BindPlayerStateToInventory()
+void UInventoryWidgetController::BindPlayerStateToInventory(ALittlePlayerState* PS)
 {
-	ALittlePlayerState* PS = Cast<ALittlePlayerState>(PlayerState);
+	PlayerState = PS;
 	if(!PS)
 		return;
 	

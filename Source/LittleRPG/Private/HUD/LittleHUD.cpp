@@ -54,7 +54,7 @@ void ALittleHUD::BeginPlay()
 {
 	Super::BeginPlay();
 	APlayerController* PC = GetOwningPlayerController();
-	APlayerState* PS = PC->GetPlayerState<APlayerState>();
+	ALittlePlayerState* PS = PC->GetPlayerState<ALittlePlayerState>();
 	ULittleStatComponent* LSC = nullptr;
 	if (ALittleBaseCharacter* Character = Cast<ALittleBaseCharacter>(GetOwningPawn()))
 		LSC = Character->GetStatComponent();
@@ -79,6 +79,6 @@ void ALittleHUD::OnPlayerStateReady()
 	ALittlePlayerState* PlayerState = Cast<ALittlePlayerState>(Character->GetPlayerState());
 	checkf(PlayerState, TEXT("ALittleHUD::OnPlayerState:  PlayerState null after OnPlayerStateReady"));
 	
-	InventoryWidgetController->BindPlayerStateToInventory();
+	InventoryWidgetController->BindPlayerStateToInventory(PlayerState);
 	HealthBarWidgetController->BindToStatComponent();
 }

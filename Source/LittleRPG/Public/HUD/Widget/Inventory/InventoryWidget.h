@@ -5,6 +5,7 @@
 #include "InventoryWidget.generated.h"
 
 
+class UUniformGridPanel;
 class UHorizontalBox;
 
 UCLASS()
@@ -19,4 +20,7 @@ public:
 protected:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UHorizontalBox> InventoryContainerBox;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UUniformGridPanel> InventoryGridPanel;
 };

@@ -51,5 +51,6 @@ void ALittlePlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProper
 
 void ALittlePlayerState::OnRep_Inventory()
 {
+	UE_LOG(LogTemp, Warning, TEXT("OnRep_Inventory fired — items: %d"), Inventory.Num());
 	OnInventoryChanged.Broadcast();
 }

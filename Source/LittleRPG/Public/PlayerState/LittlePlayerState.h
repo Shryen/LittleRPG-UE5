@@ -23,8 +23,8 @@ public:
 	void AddItem(UItemData* Item);
 	
 	void PrintInventory();
-protected:
-	void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Inventory)
 	TArray<TObjectPtr<UItemData>> Inventory;

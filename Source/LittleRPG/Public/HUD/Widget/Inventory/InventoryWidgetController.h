@@ -5,6 +5,7 @@
 #include "InventoryWidgetController.generated.h"
 
 
+class ALittlePlayerState;
 class UInventoryWidget;
 
 UCLASS()
@@ -16,7 +17,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ToggleInventory();
 	
-	void BindPlayerStateToInventory();
+	void BindPlayerStateToInventory(ALittlePlayerState* PS);
 
 private:
 	UPROPERTY()
