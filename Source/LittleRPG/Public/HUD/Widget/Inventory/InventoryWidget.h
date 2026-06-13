@@ -30,5 +30,5 @@ protected:
 	TSubclassOf<UInventoryItemWidget> InventoryItemWidgetClass;
 	
 private:
-	int32 ColumnCount = 8;
+	int32 ColumnCount = 4;
 };
