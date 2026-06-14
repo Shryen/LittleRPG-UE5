@@ -69,19 +69,9 @@ void ALittleGameModeBase::LoadGame(ALittlePlayerState* PlayerState) const
 		NewSlot.Quantity  = SavedSlot.Quantity;
 		PlayerState->GetInventory().Add(NewSlot);
 		PlayerState->Server_OnSlotChanged(NewSlot);
+		
+		PlayerState->GetInventory().Add(NewSlot);
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Game loaded — %d slots"), SaveData->SavedInventory.Num());
-	FTimerHandle LoadUITimerHandle;
-	FTimerDelegate TimerDelegate;
-	TimerDelegate.BindLambda([PlayerState]()
-	{
-		for (const FInventorySlot& Slot : PlayerState->GetInventory())
-		{
-			PlayerState->Server_OnSlotChanged(Slot);
-		}
-	});
-
-	GetWorldTimerManager().SetTimer(LoadUITimerHandle, TimerDelegate, 0.2f, false);
 }
 
 void ALittleGameModeBase::BeginPlay()
@@ -95,8 +85,8 @@ void ALittleGameModeBase::BeginPlay()
 void ALittleGameModeBase::OnPostLogin(AController* NewPlayer)
 {
 	Super::OnPostLogin(NewPlayer);
-	ALittlePlayerState* PS = NewPlayer->GetPlayerState<ALittlePlayerState>();
-	if (PS)
+	
+	if (ALittlePlayerState* PS = NewPlayer->GetPlayerState<ALittlePlayerState>())
 	{
 		LoadGame(PS);
 	}

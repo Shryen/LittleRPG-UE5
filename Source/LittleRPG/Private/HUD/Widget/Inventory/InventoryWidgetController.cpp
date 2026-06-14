@@ -51,4 +51,16 @@ void UInventoryWidgetController::BindPlayerStateToInventory(ALittlePlayerState* 
 		return;
 	
 	PS->OnInventorySlotChanged.AddUObject(this, &UInventoryWidgetController::OnSlotChanged);
+	RefreshInventory();
+}
+
+void UInventoryWidgetController::RefreshInventory()
+{
+	ALittlePlayerState* PS = Cast<ALittlePlayerState>(PlayerState);
+	if (!PS) return;
+
+	for (const FInventorySlot& Slot : PS->GetInventory())
+	{
+		OnSlotChanged(Slot);
+	}
 }

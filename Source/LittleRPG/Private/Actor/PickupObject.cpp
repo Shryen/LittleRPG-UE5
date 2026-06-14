@@ -40,17 +40,6 @@ void APickupObject::BeginPlay()
 	InitialLocation = GetActorLocation();
 }
 
-void APickupObject::Tick(float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-	
-	if (!HasAuthority())
-		return;
-
-	float Time = GetWorld()->GetTimeSeconds();
-	float NewZ = InitialLocation.Z + FMath::Sin(Time * 2) * 25;
-	SetActorLocation(FVector(InitialLocation.X, InitialLocation.Y, NewZ));
-}
 
 void APickupObject::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                               int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

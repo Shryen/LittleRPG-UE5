@@ -4,6 +4,15 @@
 #include "Engine/DataAsset.h"
 #include "ItemData.generated.h"
 
+UENUM(BlueprintType)
+enum class EItemType : uint8
+{
+	Resource    UMETA(DisplayName = "Resource"),
+	Consumable  UMETA(DisplayName = "Consumable"),
+	Equipment   UMETA(DisplayName = "Equipment"),
+	QuestItem   UMETA(DisplayName = "Quest Item")
+};
+
 /**
  * 
  */
@@ -33,4 +42,7 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int32 Quantity;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	EItemType ItemType = EItemType::Resource;
 };

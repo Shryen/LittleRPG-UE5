@@ -20,6 +20,8 @@ public:
 
 	void OnSlotChanged(const FInventorySlot& InventorySlot);
 	void BindPlayerStateToInventory(ALittlePlayerState* PS);
+	
+	void RefreshInventory();
 
 private:
 	UPROPERTY()
