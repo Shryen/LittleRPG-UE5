@@ -18,8 +18,8 @@ public:
 	ALittlePlayerState();
 	
 	FOnInventorySlotChanged OnInventorySlotChanged;
-	
-	const TArray<FInventorySlot>& GetInventory() const {return Inventory;};
+		
+	TArray<FInventorySlot>& GetInventory() {return Inventory;};
 	
 	void AddItemToInventory(UItemData* Item);
 	
@@ -35,6 +35,9 @@ public:
 	
 	UFUNCTION()
 	void OnRep_Inventory();
+	
+	int32 GetNextSlotID() const {return NextSlotID;};
+	void SetNextSlotID(const int32 NewNextSlotID) {NextSlotID = NewNextSlotID;};
 	
 private:
 	int32 NextSlotID = 1;
