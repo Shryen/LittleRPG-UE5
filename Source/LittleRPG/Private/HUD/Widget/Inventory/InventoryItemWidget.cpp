@@ -39,6 +39,7 @@ void UInventoryItemWidget::UpdateQuantity(const FInventorySlot& InventorySlot)
 		return;
 	}
 	
+	ItemQuantity->SetVisibility(ESlateVisibility::Visible); 
 	ItemQuantity->SetText(FText::AsNumber(InventorySlot.Quantity));
 }
 

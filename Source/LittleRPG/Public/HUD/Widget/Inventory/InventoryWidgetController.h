@@ -28,6 +28,4 @@ private:
 	
 	void ShowInventoryWidget();
 	void HideInventoryWidget();
-	void PopulateInventory() const;
-	
 };

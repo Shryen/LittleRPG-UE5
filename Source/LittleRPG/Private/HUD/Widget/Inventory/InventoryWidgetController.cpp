@@ -22,7 +22,6 @@ void UInventoryWidgetController::ToggleInventory()
 
 void UInventoryWidgetController::OnSlotChanged(const FInventorySlot& InventorySlot)
 {
-	UE_LOG(LogTemp, Log, TEXT("Slot changed: ID=%d, Quantity=%d"), InventorySlot.SlotID, InventorySlot.Quantity);
 	if (!InventoryWidget) return;
 	InventoryWidget->UpdateSlot(InventorySlot);
 }
@@ -45,30 +44,11 @@ void UInventoryWidgetController::HideInventoryWidget()
 	bIsOpen = false;
 }
 
-void UInventoryWidgetController::PopulateInventory() const
-{
-	ALittlePlayerState* PS = Cast<ALittlePlayerState>(PlayerState);
-	if (!PS || !InventoryWidget)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UInventoryWidgetController::PopulateInventory: Cast to UInventoryWidget failed!"));
-		return;
-	};
-
-	InventoryWidget->ClearItems();
-
-	for (const FInventorySlot& Slot : PS->GetInventory())
-	{
-		InventoryWidget->AddItem(Slot);
-	}
-}
-
 void UInventoryWidgetController::BindPlayerStateToInventory(ALittlePlayerState* PS)
 {
 	PlayerState = PS;
 	if(!PS)
 		return;
 	
-	PS->OnInventoryChanged.AddUObject(this, &UInventoryWidgetController::PopulateInventory);
 	PS->OnInventorySlotChanged.AddUObject(this, &UInventoryWidgetController::OnSlotChanged);
-	PopulateInventory();
 }
