@@ -27,4 +27,10 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int32 ItemValue;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 MaxStack;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 Quantity;
 };

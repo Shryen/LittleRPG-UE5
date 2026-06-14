@@ -4,8 +4,10 @@
 #include "GameFramework/PlayerState.h"
 #include "LittlePlayerState.generated.h"
 
+struct FInventorySlot;
 class UItemData;
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnInventorySlotChanged, const FInventorySlot&);
 DECLARE_MULTICAST_DELEGATE(FOnInventoryChanged);
 
 UCLASS()
@@ -16,19 +18,23 @@ class LITTLERPG_API ALittlePlayerState : public APlayerState
 public:
 	ALittlePlayerState();
 	
+	FOnInventorySlotChanged OnInventorySlotChanged;
 	FOnInventoryChanged OnInventoryChanged;
 	
-	const TArray<TObjectPtr<UItemData>>& GetInventory() const {return Inventory;};
+	const TArray<FInventorySlot>& GetInventory() const {return Inventory;};
 	
-	void AddItem(UItemData* Item);
+	void AddItemToInventory(UItemData* Item);
 	
 	void PrintInventory();
 	
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Inventory)
-	TArray<TObjectPtr<UItemData>> Inventory;
+	TArray<FInventorySlot> Inventory;
 	
 	UFUNCTION()
 	void OnRep_Inventory();
+	
+private:
+	int32 NextSlotID = 1;
 };

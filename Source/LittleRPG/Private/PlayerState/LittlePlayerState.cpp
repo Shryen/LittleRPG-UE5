@@ -2,6 +2,7 @@
 
 #include "PlayerState/LittlePlayerState.h"
 
+#include "Data/FInventorySlot.h"
 #include "Data/ItemData.h"
 #include "Net/UnrealNetwork.h"
 
@@ -10,7 +11,7 @@ ALittlePlayerState::ALittlePlayerState()
 	bReplicates = true;
 }
 
-void ALittlePlayerState::AddItem(UItemData* Item)
+void ALittlePlayerState::AddItemToInventory(UItemData* Item)
 {
 	if (!Item)
 		return;
@@ -18,7 +19,22 @@ void ALittlePlayerState::AddItem(UItemData* Item)
 	if (!HasAuthority())
 		return;
 	
-	Inventory.Add(Item);
+	for (FInventorySlot& Slot : Inventory)
+		if (Slot.ItemData == Item && Slot.Quantity < Slot.ItemData->MaxStack)
+		{
+			Slot.Quantity++;
+			OnInventorySlotChanged.Broadcast(Slot);
+			OnInventoryChanged.Broadcast();
+			return;
+		}
+	
+	FInventorySlot NewSlot;
+	NewSlot.SlotID   = NextSlotID++; 
+	NewSlot.ItemData = Item;
+	NewSlot.Quantity = 1;
+	
+	Inventory.Add(NewSlot);
+	OnInventorySlotChanged.Broadcast(NewSlot);
 	OnInventoryChanged.Broadcast();
 	PrintInventory();
 }
@@ -33,12 +49,15 @@ void ALittlePlayerState::PrintInventory()
 	if (!HasAuthority())
 		return;
 	
-	for (const UItemData* Item : Inventory)
+	for (int32 Index = 0; Index < Inventory.Num(); ++Index)
 	{
-		UE_LOG(LogTemp, Warning, 
-			TEXT("Item Name in Inventory: %s for Player: %s"), 
-			*Item->ItemName.ToString(),
-			*GetPlayerController()->GetName());
+		const FInventorySlot& Slot = Inventory[Index];
+		UE_LOG(LogTemp, Warning,
+				TEXT("[%d] %s | Qty: %d | MaxStack: %d"),
+				Index,
+				*Slot.ItemData->ItemName.ToString(),
+				Slot.Quantity,
+				Slot.ItemData->MaxStack);
 	}
 }
 

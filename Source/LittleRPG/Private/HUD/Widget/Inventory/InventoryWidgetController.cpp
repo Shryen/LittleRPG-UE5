@@ -1,6 +1,5 @@
 ﻿#include "HUD/Widget/Inventory/InventoryWidgetController.h"
-
-#include "Data/ItemData.h"
+#include "Data/FInventorySlot.h"
 #include "HUD/Widget/Inventory/InventoryWidget.h"
 #include "PlayerState/LittlePlayerState.h"
 
@@ -19,6 +18,13 @@ void UInventoryWidgetController::SetWidget(ULittleUserWidget* InWidget)
 void UInventoryWidgetController::ToggleInventory()
 {
 	bIsOpen ? HideInventoryWidget() : ShowInventoryWidget();
+}
+
+void UInventoryWidgetController::OnSlotChanged(const FInventorySlot& InventorySlot)
+{
+	UE_LOG(LogTemp, Log, TEXT("Slot changed: ID=%d, Quantity=%d"), InventorySlot.SlotID, InventorySlot.Quantity);
+	if (!InventoryWidget) return;
+	InventoryWidget->UpdateSlot(InventorySlot);
 }
 
 void UInventoryWidgetController::ShowInventoryWidget() 
@@ -49,15 +55,10 @@ void UInventoryWidgetController::PopulateInventory() const
 	};
 
 	InventoryWidget->ClearItems();
-	
-	for (const UItemData* Item : PS->GetInventory())
+
+	for (const FInventorySlot& Slot : PS->GetInventory())
 	{
-		if (!Item)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("UInventoryWidgetController::PopulateInventory — null item in inventory, skipping"));
-			continue; 
-		}
-		InventoryWidget->AddItem(Item);
+		InventoryWidget->AddItem(Slot);
 	}
 }
 
@@ -68,5 +69,6 @@ void UInventoryWidgetController::BindPlayerStateToInventory(ALittlePlayerState* 
 		return;
 	
 	PS->OnInventoryChanged.AddUObject(this, &UInventoryWidgetController::PopulateInventory);
+	PS->OnInventorySlotChanged.AddUObject(this, &UInventoryWidgetController::OnSlotChanged);
 	PopulateInventory();
 }

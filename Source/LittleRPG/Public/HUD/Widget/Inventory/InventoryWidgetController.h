@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "Data/FInventorySlot.h"
 #include "HUD/Widget/LittleWidgetController.h"
 #include "InventoryWidgetController.generated.h"
 
@@ -16,7 +17,8 @@ public:
 	virtual void SetWidget(ULittleUserWidget* InWidget) override;
 	UFUNCTION(BlueprintCallable)
 	void ToggleInventory();
-	
+
+	void OnSlotChanged(const FInventorySlot& InventorySlot);
 	void BindPlayerStateToInventory(ALittlePlayerState* PS);
 
 private:

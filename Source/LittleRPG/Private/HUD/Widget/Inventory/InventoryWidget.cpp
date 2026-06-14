@@ -3,7 +3,7 @@
 #include "Components/UniformGridPanel.h"
 #include "HUD/Widget/Inventory/InventoryItemWidget.h"
 
-void UInventoryWidget::AddItem(const UItemData* Item)
+void UInventoryWidget::AddItem(const FInventorySlot& InventorySlot)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Trying to add text to inventory widget"));
 	if (!InventoryGridPanel || !InventoryItemWidgetClass) return;
@@ -15,13 +15,25 @@ void UInventoryWidget::AddItem(const UItemData* Item)
 	int32 Column = Index % ColumnCount;
 	int32 Row = Index / ColumnCount;
 	
-    ItemWidget->SetItemData(Item);
+	ItemWidget->InitSlot(InventorySlot);
+	SlotWidgetMap.Add(InventorySlot.SlotID, ItemWidget);
     InventoryGridPanel->AddChildToUniformGrid(ItemWidget, Row, Column);
 	UE_LOG(LogTemp, Warning, TEXT("Widget added successfully at Row: %d Column: %d"), Row, Column);
 }
 
 void UInventoryWidget::ClearItems()
 {
-	if (InventoryGridPanel)
-		InventoryGridPanel->ClearChildren();
+	if (!InventoryGridPanel)
+		return;
+		
+	InventoryGridPanel->ClearChildren();
+	SlotWidgetMap.Empty();
+}
+
+void UInventoryWidget::UpdateSlot(const FInventorySlot& InventorySlot)
+{
+	UInventoryItemWidget** Found = SlotWidgetMap.Find(InventorySlot.SlotID);
+	if (!Found) return;
+
+	(*Found)->InitSlot(InventorySlot);
 }

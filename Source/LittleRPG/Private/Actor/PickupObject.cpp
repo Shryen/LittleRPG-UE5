@@ -66,7 +66,7 @@ void APickupObject::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* Other
 		ALittlePlayerState* PlayerState = Cast<ALittlePlayerState>(Character->GetPlayerState());
 		if (PlayerState)
 		{
-			PlayerState->AddItem(ItemData);
+			PlayerState->AddItemToInventory(ItemData);
 			Destroy();
 		}
 		Interact(Character);

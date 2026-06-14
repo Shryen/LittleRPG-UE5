@@ -5,6 +5,7 @@
 #include "InventoryWidget.generated.h"
 
 
+struct FInventorySlot;
 class UInventoryItemWidget;
 class UItemData;
 class UUniformGridPanel;
@@ -16,8 +17,10 @@ class LITTLERPG_API UInventoryWidget : public ULittleUserWidget
 	GENERATED_BODY()
 	
 public:
-	void AddItem(const UItemData* Item);
+	void AddItem(const FInventorySlot& InventorySlot);
 	void ClearItems();
+	void UpdateSlot(const FInventorySlot& Slot);
+
 
 protected:
 	UPROPERTY(meta=(BindWidget))
@@ -31,4 +34,6 @@ protected:
 	
 private:
 	int32 ColumnCount = 4;
+	UPROPERTY()
+	TMap<int32, UInventoryItemWidget*> SlotWidgetMap;
 };
