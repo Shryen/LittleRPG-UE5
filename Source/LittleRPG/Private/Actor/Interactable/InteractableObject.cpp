@@ -9,6 +9,7 @@ AInteractableObject::AInteractableObject()
 
 void AInteractableObject::Interact(AActor* Interactor)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Interacted with object: %s"), *GetName());
+	if (!HasAuthority()) return;
+	UE_LOG(LogTemp, Warning, TEXT("Interacted with object: %s by %s"), *GetName(), *Interactor->GetName());
 }
 

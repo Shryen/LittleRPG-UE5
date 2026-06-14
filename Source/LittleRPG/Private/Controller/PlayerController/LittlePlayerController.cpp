@@ -4,6 +4,7 @@
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 #include "InputCoreTypes.h"
+#include "Actor/Interactable/InteractableObject.h"
 #include "Character/LittlePlayerCharacter.h"
 #include "Component/StatComponent/LittleStatComponent.h"
 #include "HUD/LittleHUD.h"
@@ -64,6 +65,8 @@ void ALittlePlayerController::SetupInputComponent()
 		ETriggerEvent::Triggered,
 		this,
 		&ALittlePlayerController::HandleInventory);
+	
+	EnhancedInput->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ALittlePlayerController::HandleInteract);
 }
 
 void ALittlePlayerController::Move(const FInputActionValue& Value)
@@ -104,6 +107,34 @@ void ALittlePlayerController::HandleInventory(const FInputActionValue& Value)
 		return;
 	
 	LittleHUD->GetInventoryWidgetController()->ToggleInventory();
+}
+
+void ALittlePlayerController::HandleInteract(const FInputActionValue& Value)
+{
+	FVector CameraLocation;
+	FRotator CameraRotation;
+	GetPlayerViewPoint(CameraLocation, CameraRotation);
+	
+	UE_LOG(LogTemp, Warning, TEXT("Got PlayerViewPoint"));
+	
+	FVector TraceEnd = CameraLocation + CameraRotation.Vector() * 500.f;
+
+	FHitResult Hit;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(GetPawn());
+	
+	bool bHit = GetWorld()->LineTraceSingleByChannel(
+		Hit, CameraLocation, TraceEnd,
+		ECC_Visibility, Params);
+	
+	DrawDebugLine(GetWorld(), CameraLocation, TraceEnd, bHit ? FColor::Green : FColor::Red, false, 2.f);
+
+	if (!bHit) return;
+	
+	AInteractableObject* Interactable = Cast<AInteractableObject>(Hit.GetActor());
+	if (!Interactable)
+		return;
+	Interactable->Interact(GetPawn());
 }
 
 void ALittlePlayerController::TestDamage()

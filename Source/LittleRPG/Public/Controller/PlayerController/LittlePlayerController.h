@@ -27,6 +27,7 @@ private:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void HandleInventory(const FInputActionValue& Value);
+	void HandleInteract(const FInputActionValue& Value);
 	
 	void TestDamage();
 
@@ -44,5 +45,8 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UInputAction> TakeDamageTest;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> InteractAction;
 	
 };

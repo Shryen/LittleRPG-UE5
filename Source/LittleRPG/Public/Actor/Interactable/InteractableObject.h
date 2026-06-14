@@ -14,8 +14,9 @@ class LITTLERPG_API AInteractableObject : public AActor, public IInteractable
 
 public:
 	AInteractableObject();
-protected:
 	virtual void Interact(AActor* Interactor) override;
+
+protected:
 	virtual FText GetInteractText() override {return InteractText;}; 
 	
 private:
