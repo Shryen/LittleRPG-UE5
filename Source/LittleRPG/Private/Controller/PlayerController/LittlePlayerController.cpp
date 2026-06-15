@@ -69,6 +69,16 @@ void ALittlePlayerController::SetupInputComponent()
 	EnhancedInput->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ALittlePlayerController::HandleInteract);
 }
 
+void ALittlePlayerController::Server_Interact_Implementation(AActor* InteractableActor)
+{
+	if (!InteractableActor) return;
+
+	IInteractable* Interactable = Cast<IInteractable>(InteractableActor);
+	if (!Interactable) return;
+
+	Interactable->Interact(GetPawn());
+}
+
 void ALittlePlayerController::Move(const FInputActionValue& Value)
 {
 	APawn* ControlledPawn = GetPawn();
@@ -131,10 +141,7 @@ void ALittlePlayerController::HandleInteract(const FInputActionValue& Value)
 
 	if (!bHit) return;
 	
-	AInteractableObject* Interactable = Cast<AInteractableObject>(Hit.GetActor());
-	if (!Interactable)
-		return;
-	Interactable->Interact(GetPawn());
+	Server_Interact(Hit.GetActor());
 }
 
 void ALittlePlayerController::TestDamage()

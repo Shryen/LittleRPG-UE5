@@ -22,6 +22,9 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
+	
+	UFUNCTION(Server, Reliable)
+	void Server_Interact(AActor* InteractableActor);
 
 private:
 	void Move(const FInputActionValue& Value);

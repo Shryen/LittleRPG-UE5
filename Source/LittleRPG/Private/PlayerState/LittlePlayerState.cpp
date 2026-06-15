@@ -39,17 +39,32 @@ void ALittlePlayerState::AddItemToInventory(UItemData* Item)
 
 void ALittlePlayerState::PrintInventory()
 {
-	if (Inventory.IsEmpty())
-	{
-		return;
-	}
-	
 	if (!HasAuthority())
 		return;
 	
+	if (Inventory.IsEmpty())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ALittlePlayerState::PrintInventory: Inventory is empty"));
+		return;
+	}
+	
+	UE_LOG(LogTemp, Warning, TEXT("PrintInventory: %s has %d slots:"), *GetPlayerName(), Inventory.Num());
+	
+	
 	for (int32 Index = 0; Index < Inventory.Num(); ++Index)
 	{
-		const FInventorySlot& Slot = Inventory[Index];
+		const FInventorySlot& InventorySlot = Inventory[Index];
+		if (!InventorySlot.ItemData)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("  [%d] SlotID: %d | Empty slot"), Index, InventorySlot.SlotID);
+			continue;
+		}
+        
+		UE_LOG(LogTemp, Warning, TEXT("  [%d] SlotID: %d | Item: %s | Qty: %d"),
+			Index,
+			InventorySlot.SlotID,
+			*InventorySlot.ItemData->ItemName.ToString(),
+			InventorySlot.Quantity);
 	}
 }
 

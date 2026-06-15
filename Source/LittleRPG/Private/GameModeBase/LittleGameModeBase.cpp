@@ -69,8 +69,6 @@ void ALittleGameModeBase::LoadGame(ALittlePlayerState* PlayerState) const
 		NewSlot.Quantity  = SavedSlot.Quantity;
 		PlayerState->GetInventory().Add(NewSlot);
 		PlayerState->Server_OnSlotChanged(NewSlot);
-		
-		PlayerState->GetInventory().Add(NewSlot);
 	}
 }
 
