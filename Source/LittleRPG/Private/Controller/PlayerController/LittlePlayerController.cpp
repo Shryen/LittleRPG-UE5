@@ -3,10 +3,11 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
-#include "InputCoreTypes.h"
 #include "Actor/Interactable/InteractableObject.h"
+#include "Actor/Resource/ResourceNode.h"
 #include "Character/LittlePlayerCharacter.h"
 #include "Component/StatComponent/LittleStatComponent.h"
+#include "Components/InstancedStaticMeshComponent.h"
 #include "HUD/LittleHUD.h"
 #include "HUD/Widget/Inventory/InventoryWidgetController.h"
 
@@ -67,6 +68,38 @@ void ALittlePlayerController::SetupInputComponent()
 		&ALittlePlayerController::HandleInventory);
 	
 	EnhancedInput->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ALittlePlayerController::HandleInteract);
+}
+
+void ALittlePlayerController::Server_InteractAndSwap_Implementation(UInstancedStaticMeshComponent* Component,
+	int32 InstanceIndex)
+{
+	if (!Component || !HasAuthority()) return;
+	if (!Component->IsValidInstance(InstanceIndex)) return;
+	
+	TSubclassOf<AResourceNode> SpawnClass = nullptr;
+	for (const FName& TagName : Component->ComponentTags)
+	{
+		FGameplayTag Tag = FGameplayTag::RequestGameplayTag(TagName);
+		if (const TSubclassOf<AResourceNode>* Found = ResourceNodeClassMap.Find(Tag))
+		{
+			SpawnClass = *Found;
+			break;
+		}
+	}
+	if (!SpawnClass) return;
+	
+	FTransform InstanceTransform;
+	Component->GetInstanceTransform(InstanceIndex, InstanceTransform, true);
+	Component->RemoveInstance(InstanceIndex);
+	
+	AResourceNode* Node = GetWorld()->SpawnActorDeferred<AResourceNode>(
+	   SpawnClass, InstanceTransform, this);
+	
+	if (Node)
+	{
+		Node->FinishSpawning(InstanceTransform);
+		Node->Interact(GetPawn());
+	}
 }
 
 void ALittlePlayerController::Server_Interact_Implementation(AActor* InteractableActor)
@@ -140,6 +173,20 @@ void ALittlePlayerController::HandleInteract(const FInputActionValue& Value)
 	DrawDebugLine(GetWorld(), CameraLocation, TraceEnd, bHit ? FColor::Green : FColor::Red, false, 2.f);
 
 	if (!bHit) return;
+	
+	if (UInstancedStaticMeshComponent* ISMC = Cast<UInstancedStaticMeshComponent>(Hit.Component))
+	{
+		for (const FName& TagName : ISMC->ComponentTags)
+		{
+			FGameplayTag Tag = FGameplayTag::RequestGameplayTag(TagName);
+			if (Tag.IsValid() && ResourceNodeClassMap.Contains(Tag))
+			{
+				Server_InteractAndSwap(ISMC, Hit.Item);
+				return;
+			}
+		}
+	}
+
 	
 	Server_Interact(Hit.GetActor());
 }

@@ -1,9 +1,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "GameFramework/PlayerController.h"
 #include "LittlePlayerController.generated.h"
 
+class AResourceNode;
 class UInputAction;
 class UInputMappingContext;
 struct FInputActionValue;
@@ -25,6 +27,12 @@ protected:
 	
 	UFUNCTION(Server, Reliable)
 	void Server_Interact(AActor* InteractableActor);
+	
+	UFUNCTION(Server, Reliable)
+	void Server_InteractAndSwap(UInstancedStaticMeshComponent* Component, int32 InstanceIndex);
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Interaction")
+	TMap<FGameplayTag, TSubclassOf<AResourceNode>> ResourceNodeClassMap;
 
 private:
 	void Move(const FInputActionValue& Value);
