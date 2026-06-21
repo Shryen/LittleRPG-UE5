@@ -23,6 +23,13 @@ void UInventoryWidgetController::ToggleInventory()
 void UInventoryWidgetController::OnSlotChanged(const FInventorySlot& InventorySlot)
 {
 	if (!InventoryWidget) return;
+	
+	if (InventorySlot.SlotID == INDEX_NONE)
+	{
+		InventoryWidget->ClearItems();
+		return;
+	}
+	
 	InventoryWidget->UpdateSlot(InventorySlot);
 }
 

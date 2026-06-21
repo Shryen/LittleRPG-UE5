@@ -37,6 +37,19 @@ void ALittlePlayerState::AddItemToInventory(UItemData* Item)
 	PrintInventory();
 }
 
+void ALittlePlayerState::TestClearInventory()
+{
+	if (!HasAuthority()) return;
+
+	Inventory.Empty();
+	
+	FInventorySlot ClearSlot;
+	ClearSlot.SlotID = INDEX_NONE;
+	Server_OnSlotChanged(ClearSlot);
+	
+	PrintInventory();
+}
+
 void ALittlePlayerState::PrintInventory()
 {
 	if (!HasAuthority())

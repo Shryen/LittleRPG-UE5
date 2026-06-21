@@ -23,12 +23,12 @@ public:
 	
 	void AddItemToInventory(UItemData* Item);
 	
+	UFUNCTION(BlueprintCallable)
+	void TestClearInventory();
+	
 	void PrintInventory();
 	
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
-	
-	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Inventory)
-	TArray<FInventorySlot> Inventory;
 	
 	UFUNCTION(NetMulticast, Reliable)
 	void Server_OnSlotChanged(const FInventorySlot& Slot);
@@ -41,4 +41,7 @@ public:
 	
 private:
 	int32 NextSlotID = 1;
+	
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Inventory)
+	TArray<FInventorySlot> Inventory;
 };

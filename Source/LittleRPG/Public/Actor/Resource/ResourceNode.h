@@ -14,7 +14,9 @@ class LITTLERPG_API AResourceNode : public AInteractableObject
 
 public:
 	AResourceNode();
-	
+
+	void Respawn();
+	void HideHarvestedMesh();
 	virtual void Interact(AActor* Interactor) override;
 	
 	
@@ -34,7 +36,9 @@ private:
 	int32 ResourceAmount = 5.f;
 	
 	UPROPERTY(EditDefaultsOnly)
-	float RespawnTime = 0.f;
+	float RespawnTime = 5.f;
 	
 	float Health = 50.f;
+	
+	FTimerHandle RespawnTimerHandle;
 };

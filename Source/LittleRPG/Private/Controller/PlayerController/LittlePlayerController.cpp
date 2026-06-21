@@ -30,6 +30,18 @@ void ALittlePlayerController::BeginPlay()
 			InputSubsystem->AddMappingContext(MovementMappingContext, 0);
 		}
 	}
+	
+	FActorSpawnParameters Params;
+	Params.bNoFail = true;
+	for (auto& Pair : ResourceNodeClassMap)
+	{
+		if (Pair.Value)
+		{
+			AResourceNode* Warmup = GetWorld()->SpawnActor<AResourceNode>(
+				Pair.Value, FTransform::Identity, Params);
+			if (Warmup) Warmup->Destroy();
+		}
+	}
 }
 
 void ALittlePlayerController::SetupInputComponent()

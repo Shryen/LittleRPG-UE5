@@ -13,6 +13,23 @@ AResourceNode::AResourceNode()
 	RootComponent = Mesh;
 }
 
+void AResourceNode::Respawn()
+{
+	Mesh->SetVisibility(true);
+	Mesh->SetCollisionProfileName(TEXT("BlockAll"));
+	SetActorEnableCollision(true);
+	GetWorldTimerManager().ClearTimer(RespawnTimerHandle);
+	Health = 50.f;
+}
+
+void AResourceNode::HideHarvestedMesh()
+{
+	Mesh->SetVisibility(false);
+	Mesh->SetCollisionProfileName(TEXT("NoCollision"));
+	SetActorEnableCollision(false);
+	GetWorldTimerManager().SetTimer(RespawnTimerHandle, this, &AResourceNode::Respawn, RespawnTime, false);
+}
+
 void AResourceNode::Interact(AActor* Interactor)
 {
 	Super::Interact(Interactor);
@@ -30,7 +47,7 @@ void AResourceNode::Interact(AActor* Interactor)
 	PS->AddItemToInventory(ResourceType->DropsItem);
 
 	if (Health <= 0.f)
-		UE_LOG(LogTemp, Warning, TEXT("AResourceNode: %s depleted"), *GetName());
+		HideHarvestedMesh();
 }
 
 
@@ -38,6 +55,5 @@ void AResourceNode::Interact(AActor* Interactor)
 void AResourceNode::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
