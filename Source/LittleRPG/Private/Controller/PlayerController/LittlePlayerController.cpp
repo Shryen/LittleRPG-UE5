@@ -40,6 +40,7 @@ void ALittlePlayerController::BeginPlay()
 			AResourceNode* Warmup = GetWorld()->SpawnActor<AResourceNode>(
 				Pair.Value, FTransform::Identity, Params);
 			if (Warmup) Warmup->Destroy();
+			UE_LOG(LogTemp, Warning, TEXT("Warmup for object: %s"), *Pair.Value->GetName());
 		}
 	}
 }
@@ -91,13 +92,22 @@ void ALittlePlayerController::Server_InteractAndSwap_Implementation(UInstancedSt
 	TSubclassOf<AResourceNode> SpawnClass = nullptr;
 	for (const FName& TagName : Component->ComponentTags)
 	{
-		FGameplayTag Tag = FGameplayTag::RequestGameplayTag(TagName);
+		if (!UGameplayTagsManager::Get().IsValidGameplayTagString(TagName.ToString()))
+			continue;
+
+		FGameplayTag Tag =
+			FGameplayTag::RequestGameplayTag(TagName, false);
+
+		if (!Tag.IsValid()) continue;
+		
 		if (const TSubclassOf<AResourceNode>* Found = ResourceNodeClassMap.Find(Tag))
 		{
 			SpawnClass = *Found;
 			break;
 		}
+		
 	}
+	
 	if (!SpawnClass) return;
 	
 	FTransform InstanceTransform;
@@ -190,7 +200,8 @@ void ALittlePlayerController::HandleInteract(const FInputActionValue& Value)
 	{
 		for (const FName& TagName : ISMC->ComponentTags)
 		{
-			FGameplayTag Tag = FGameplayTag::RequestGameplayTag(TagName);
+			FGameplayTag Tag = FGameplayTag::RequestGameplayTag(TagName, false);
+			if (!Tag.IsValid()) continue;
 			if (Tag.IsValid() && ResourceNodeClassMap.Contains(Tag))
 			{
 				Server_InteractAndSwap(ISMC, Hit.Item);

@@ -15,6 +15,7 @@ AResourceNode::AResourceNode()
 
 void AResourceNode::Respawn()
 {
+	if (!HasAuthority()) return;
 	Mesh->SetVisibility(true);
 	Mesh->SetCollisionProfileName(TEXT("BlockAll"));
 	SetActorEnableCollision(true);
@@ -24,6 +25,7 @@ void AResourceNode::Respawn()
 
 void AResourceNode::HideHarvestedMesh()
 {
+	if (!HasAuthority()) return;
 	Mesh->SetVisibility(false);
 	Mesh->SetCollisionProfileName(TEXT("NoCollision"));
 	SetActorEnableCollision(false);
