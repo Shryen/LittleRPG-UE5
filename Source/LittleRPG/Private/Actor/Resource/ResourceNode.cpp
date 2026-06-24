@@ -1,5 +1,6 @@
 ﻿#include "Actor/Resource/ResourceNode.h"
 
+#include "Component/InventoryManager/LittleInventoryManagerComponent.h"
 #include "Data/ResourceData.h"
 #include "PlayerState/LittlePlayerState.h"
 
@@ -46,7 +47,7 @@ void AResourceNode::Interact(AActor* Interactor)
 	if (!PS) return;
 
 	if (!ResourceType || !ResourceType->DropsItem) return;
-	PS->AddItemToInventory(ResourceType->DropsItem);
+	PS->GetInventoryManager()->AddItemToInventory(ResourceType->DropsItem);
 
 	if (Health <= 0.f)
 		HideHarvestedMesh();

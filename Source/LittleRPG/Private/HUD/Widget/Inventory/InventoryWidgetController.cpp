@@ -1,4 +1,5 @@
 ﻿#include "HUD/Widget/Inventory/InventoryWidgetController.h"
+#include "Component/InventoryManager/LittleInventoryManagerComponent.h"
 #include "Data/FInventorySlot.h"
 #include "HUD/Widget/Inventory/InventoryWidget.h"
 #include "PlayerState/LittlePlayerState.h"
@@ -56,9 +57,12 @@ void UInventoryWidgetController::BindPlayerStateToInventory(ALittlePlayerState* 
 	PlayerState = PS;
 	if(!PS)
 		return;
-	
-	PS->OnInventorySlotChanged.AddUObject(this, &UInventoryWidgetController::OnSlotChanged);
-	RefreshInventory();
+
+	if (ULittleInventoryManagerComponent* Manager = PS->GetInventoryManager())
+	{
+		Manager->OnInventorySlotChanged.AddUObject(this, &UInventoryWidgetController::OnSlotChanged);
+		RefreshInventory();
+	}
 }
 
 void UInventoryWidgetController::RefreshInventory()
@@ -66,7 +70,10 @@ void UInventoryWidgetController::RefreshInventory()
 	ALittlePlayerState* PS = Cast<ALittlePlayerState>(PlayerState);
 	if (!PS) return;
 
-	for (const FInventorySlot& Slot : PS->GetInventory())
+	ULittleInventoryManagerComponent* Manager = PS->GetInventoryManager();
+	if (!Manager) return;
+
+	for (const FInventorySlot& Slot : Manager->GetInventory())
 	{
 		OnSlotChanged(Slot);
 	}

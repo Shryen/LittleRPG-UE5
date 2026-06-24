@@ -1,6 +1,7 @@
 ﻿#include "Actor/PickupObject.h"
 
 #include "Character/LittleBaseCharacter.h"
+#include "Component/InventoryManager/LittleInventoryManagerComponent.h"
 #include "Components/SphereComponent.h"
 #include "PlayerState/LittlePlayerState.h"
 
@@ -55,7 +56,7 @@ void APickupObject::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* Other
 		ALittlePlayerState* PlayerState = Cast<ALittlePlayerState>(Character->GetPlayerState());
 		if (PlayerState)
 		{
-			PlayerState->AddItemToInventory(ItemData);
+			PlayerState->GetInventoryManager()->AddItemToInventory(ItemData);
 			Destroy();
 		}
 		Interact(Character);

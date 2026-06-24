@@ -20,6 +20,9 @@ public:
 	ULittleStatComponent* GetStatComponent() const {return LittleStatComponent;}
 	
 	FOnPlayerStateReadySignature OnPlayerStateReady;
+	
+	
+	USceneComponent* GetLightMagicSceneComponent() const {return LightMagicSceneComponent;}
 
 protected:
 	virtual void BeginPlay() override;
@@ -32,4 +35,7 @@ private:
 	
 	UFUNCTION()
 	void HandleStatChanged(EAttribute StaType, float NewStat);
+	
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<USceneComponent> LightMagicSceneComponent;
 };

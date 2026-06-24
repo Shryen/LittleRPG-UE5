@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Engine/DataAsset.h"
 #include "ItemData.generated.h"
 
@@ -45,4 +46,7 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EItemType ItemType = EItemType::Resource;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag ItemTag;
 };

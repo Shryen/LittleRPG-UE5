@@ -1,6 +1,7 @@
 #include "GameModeBase/LittleGameModeBase.h"
 
 #include "Character/LittlePlayerCharacter.h"
+#include "Component/InventoryManager/LittleInventoryManagerComponent.h"
 #include "Controller/PlayerController/LittlePlayerController.h"
 #include "Data/FInventorySlot.h"
 #include "Data/ItemData.h"
@@ -21,9 +22,9 @@ void ALittleGameModeBase::SaveGame() const
 	if (!LPS) return;
 	
 	ULittleSaveGame* SaveData = Cast<ULittleSaveGame>(UGameplayStatics::CreateSaveGameObject(ULittleSaveGame::StaticClass()));
-	SaveData->SavedNextSlotID = LPS->GetNextSlotID();
+	SaveData->SavedNextSlotID = LPS->GetInventoryManager()->GetNextSlotID();
 
-	for (const FInventorySlot& InventorySlot : LPS->GetInventory())
+	for (const FInventorySlot& InventorySlot : LPS->GetInventoryManager()->GetInventory())
 	{
 		if (!InventorySlot.ItemData) continue;
 		
@@ -52,8 +53,8 @@ void ALittleGameModeBase::LoadGame(ALittlePlayerState* PlayerState) const
 	ULittleSaveGame* SaveData = Cast<ULittleSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveSlotName, UserIndex));
 	if (!SaveData) return;
 	
-	PlayerState->SetNextSlotID(SaveData->SavedNextSlotID);
-	
+	PlayerState->GetInventoryManager()->SetNextSlotID(SaveData->SavedNextSlotID);
+
 	for (const FSavedInventorySlot& SavedSlot : SaveData->SavedInventory)
 	{
 		UItemData* Item = Cast<UItemData>(SavedSlot.ItemDataPath.TryLoad());
@@ -62,13 +63,13 @@ void ALittleGameModeBase::LoadGame(ALittlePlayerState* PlayerState) const
 			UE_LOG(LogTemp, Warning, TEXT("Item Data is null"));
 			continue;
 		}
-		
+
 		FInventorySlot NewSlot;
 		NewSlot.SlotID    = SavedSlot.SlotID;
 		NewSlot.ItemData  = Item;
 		NewSlot.Quantity  = SavedSlot.Quantity;
-		PlayerState->GetInventory().Add(NewSlot);
-		PlayerState->Server_OnSlotChanged(NewSlot);
+		PlayerState->GetInventoryManager()->GetInventory().Add(NewSlot);
+		PlayerState->GetInventoryManager()->Server_OnSlotChanged(NewSlot);
 	}
 }
 
