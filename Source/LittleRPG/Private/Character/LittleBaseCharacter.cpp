@@ -10,6 +10,7 @@ ALittleBaseCharacter::ALittleBaseCharacter()
 	
 	LittleStatComponent = CreateDefaultSubobject<ULittleStatComponent>(TEXT("LittleStatComponent"));
 	LightMagicSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("LightMagicSceneComponent"));
+	LightMagicSceneComponent->SetupAttachment(GetRootComponent());
 	
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	

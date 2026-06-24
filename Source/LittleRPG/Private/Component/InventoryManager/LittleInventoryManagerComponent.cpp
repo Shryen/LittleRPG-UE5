@@ -51,6 +51,40 @@ void ULittleInventoryManagerComponent::TestClearInventory()
 	PrintInventory();
 }
 
+void ULittleInventoryManagerComponent::Server_EquipItem_Implementation(UItemData* Item, AActor* SpawnedActor)
+{
+	if (!Item || !SpawnedActor)
+		return;
+
+	if (EquippedActor && EquippedActor != SpawnedActor)
+	{
+		EquippedActor->Destroy();
+	}
+
+	EquippedItem  = Item;
+	EquippedActor = SpawnedActor;
+
+	UE_LOG(LogTemp, Warning, TEXT("ULittleInventoryManagerComponent::Server_EquipItem: Equipped [%s]"), *Item->ItemName.ToString());
+	OnEquippedItemChanged.Broadcast(EquippedItem);
+}
+
+void ULittleInventoryManagerComponent::Server_UnequipItem_Implementation()
+{
+	if (!EquippedItem)
+		return;
+
+	if (EquippedActor)
+	{
+		EquippedActor->Destroy();
+		EquippedActor = nullptr;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("ULittleInventoryManagerComponent::Server_UnequipItem: Unequipped [%s]"), *EquippedItem->ItemName.ToString());
+
+	EquippedItem = nullptr;
+	OnEquippedItemChanged.Broadcast(nullptr);
+}
+
 void ULittleInventoryManagerComponent::PrintInventory()
 {
 	if (!GetOwner()->HasAuthority())
@@ -102,10 +136,16 @@ void ULittleInventoryManagerComponent::OnRep_Inventory()
 	}
 }
 
+void ULittleInventoryManagerComponent::OnRep_EquippedItem()
+{
+	OnEquippedItemChanged.Broadcast(EquippedItem);
+}
+
 void ULittleInventoryManagerComponent::GetLifetimeReplicatedProps(
 	TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ULittleInventoryManagerComponent, Inventory);
+	DOREPLIFETIME(ULittleInventoryManagerComponent, EquippedItem);
 }

@@ -22,6 +22,13 @@ AEquipment::AEquipment()
 	BoxCollision->SetGenerateOverlapEvents(true);
 }
 
+void AEquipment::TurnOffCollision()
+{
+	BoxCollision->SetGenerateOverlapEvents(false);
+	BoxCollision->SetCollisionProfileName("NoCollision");
+	SetActorEnableCollision(false);
+}
+
 void AEquipment::BeginPlay()
 {
 	Super::BeginPlay();
@@ -42,6 +49,21 @@ void AEquipment::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor
 	ALittlePlayerState* PS = Cast<ALittlePlayerState>(PlayerCharacter->GetPlayerState());
 	if (!PS) return;
 	PS->GetInventoryManager()->AddItemToInventory(ItemData);
+	
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = PlayerCharacter;
+	SpawnParams.Instigator = PlayerCharacter;
+	
+	AActor* NewEquipment = GetWorld()->SpawnActor<AActor>(ItemData->ItemClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+	if (!NewEquipment) return;
+	NewEquipment->SetOwner(PS);
+	NewEquipment->SetActorEnableCollision(false);
+
+	FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, true);
+	NewEquipment->AttachToComponent(PlayerCharacter->GetLightMagicSceneComponent(), AttachRules);
+
+	PS->GetInventoryManager()->Server_EquipItem(ItemData, NewEquipment);
+
 	Destroy();
 }
 

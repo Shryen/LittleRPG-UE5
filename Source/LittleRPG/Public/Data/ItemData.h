@@ -5,6 +5,8 @@
 #include "Engine/DataAsset.h"
 #include "ItemData.generated.h"
 
+class APickupObject;
+
 UENUM(BlueprintType)
 enum class EItemType : uint8
 {
@@ -49,4 +51,7 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FGameplayTag ItemTag;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<AActor> ItemClass; 
 };

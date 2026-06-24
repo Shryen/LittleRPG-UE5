@@ -8,3 +8,7 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Resource_Wood_Log)
 
 // Equipment Tags
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Equipment_Light)
+
+// Equip functionality
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Equipment_Equipped)
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Equipment_UnEquipped)
