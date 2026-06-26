@@ -14,9 +14,13 @@ class LITTLERPG_API AResourceNode : public AInteractableObject
 
 public:
 	AResourceNode();
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_HideMesh();
 
-	void Respawn();
-	void HideHarvestedMesh();
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_Respawn();
+	
 	virtual void Interact(AActor* Interactor) override;
 	
 	UResourceData* GetResourceType() const { return ResourceType; }

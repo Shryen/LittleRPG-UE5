@@ -11,31 +11,14 @@ AResourceNode::AResourceNode()
 	bReplicates = true;
 	
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
+	Mesh->SetIsReplicated(true);
 	RootComponent = Mesh;
-}
-
-void AResourceNode::Respawn()
-{
-	if (!HasAuthority()) return;
-	Mesh->SetVisibility(true);
-	Mesh->SetCollisionProfileName(TEXT("BlockAll"));
-	SetActorEnableCollision(true);
-	GetWorldTimerManager().ClearTimer(RespawnTimerHandle);
-	Health = 50.f;
-}
-
-void AResourceNode::HideHarvestedMesh()
-{
-	if (!HasAuthority()) return;
-	Mesh->SetVisibility(false);
-	Mesh->SetCollisionProfileName(TEXT("NoCollision"));
-	SetActorEnableCollision(false);
-	GetWorldTimerManager().SetTimer(RespawnTimerHandle, this, &AResourceNode::Respawn, RespawnTime, false);
 }
 
 void AResourceNode::Interact(AActor* Interactor)
 {
 	Super::Interact(Interactor);
+
 	if (Health <= 0.f) return;
 
 	Health -= 10.f;
@@ -50,10 +33,25 @@ void AResourceNode::Interact(AActor* Interactor)
 	PS->GetInventoryManager()->AddItemToInventory(ResourceType->DropsItemRowName, ResourceAmount);
 
 	if (Health <= 0.f)
-		HideHarvestedMesh();
+		Multicast_HideMesh();
 }
 
+void AResourceNode::Multicast_HideMesh_Implementation()
+{
+	Mesh->SetVisibility(false);
+	Mesh->SetCollisionProfileName(TEXT("NoCollision"));
+	SetActorEnableCollision(false);
+	GetWorldTimerManager().SetTimer(RespawnTimerHandle, this, &AResourceNode::Multicast_Respawn, RespawnTime, false);
+}
 
+void AResourceNode::Multicast_Respawn_Implementation()
+{
+	Mesh->SetVisibility(true);
+	Mesh->SetCollisionProfileName(TEXT("BlockAll"));
+	SetActorEnableCollision(true);
+	GetWorldTimerManager().ClearTimer(RespawnTimerHandle);
+	Health = 50.f;
+}
 
 void AResourceNode::BeginPlay()
 {
