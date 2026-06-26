@@ -77,4 +77,5 @@ void ALittleHUD::OnPlayerStateReady()
 	ALittleBaseCharacter* Character = Cast<ALittleBaseCharacter>(GetOwningPawn());
 	checkf(Character, TEXT("ALittleHUD::OnPlayerState: Character not found"));
 	HealthBarWidgetController->BindToStatComponent();
+	InventoryWidgetController->BindDependencies();
 }

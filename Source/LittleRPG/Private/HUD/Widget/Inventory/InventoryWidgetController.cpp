@@ -18,7 +18,6 @@ void UInventoryWidgetController::SetWidget(ULittleUserWidget* InWidget)
 	}
 	InventoryWidget->SetVisibility(ESlateVisibility::Collapsed);
 	LittlePlayerState = Cast<ALittlePlayerState>(PlayerState);
-	BindDependencies();
 }
 
 void UInventoryWidgetController::ToggleInventory()
@@ -28,6 +27,7 @@ void UInventoryWidgetController::ToggleInventory()
 
 void UInventoryWidgetController::BindDependencies()
 {
+    LittlePlayerState = PlayerController ? PlayerController->GetPlayerState<ALittlePlayerState>() : nullptr;
 	if (!LittlePlayerState) { UE_LOG(LogTemp, Error, TEXT("[BindDependencies] LittlePlayerState is NULL")); return; }
 	ULittleInventoryManagerComponent* Manager = LittlePlayerState->GetInventoryManager();
 	if (!Manager) { UE_LOG(LogTemp, Error, TEXT("[BindDependencies] Manager is NULL")); return; }

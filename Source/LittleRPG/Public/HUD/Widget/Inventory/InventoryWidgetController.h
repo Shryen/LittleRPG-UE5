@@ -20,7 +20,8 @@ public:
 	virtual void SetWidget(ULittleUserWidget* InWidget) override;
 	UFUNCTION(BlueprintCallable)
 	void ToggleInventory();
-
+	
+	void BindDependencies();
 private:
 	UPROPERTY()
 	TObjectPtr<UInventoryWidget> InventoryWidget;
@@ -37,5 +38,4 @@ private:
 	void ShowInventoryWidget();
 	void HideInventoryWidget();
 	
-	void BindDependencies();
 };
