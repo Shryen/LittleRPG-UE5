@@ -4,9 +4,13 @@
 #include "HUD/Widget/LittleUserWidget.h"
 #include "EquipmentPanelWidget.generated.h"
 
+struct FEquipmentDisplayPayload;
 class UEquipmentSlotWidget;
 class UVerticalBox;
 enum class EEquipmentSlot : uint8;
+
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnEquipmentPanelSlotRightClicked, EEquipmentSlot);
 
 UCLASS()
 class LITTLERPG_API UEquipmentPanelWidget : public ULittleUserWidget
@@ -14,22 +18,27 @@ class LITTLERPG_API UEquipmentPanelWidget : public ULittleUserWidget
 	GENERATED_BODY()
 	
 public:
+	
+	void UpdateFromPayload(const FEquipmentDisplayPayload& Payload);
+	
+	FOnEquipmentPanelSlotRightClicked OnEquipmentSlotRightClicked;
+
+
+protected:
 	virtual void NativeConstruct() override;
 	
-    void UpdateSlot(EEquipmentSlot SlotType, FName ItemRowName);
-	void ClearAllSlots();
-	void SetItemDataTable(UDataTable* InDataTable) { ItemDataTable = InDataTable; }
-protected:
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UVerticalBox> SlotContainer;
+	UPROPERTY(meta = (BindWidget)) TObjectPtr<UEquipmentSlotWidget> Slot_Head;
+	UPROPERTY(meta = (BindWidget)) TObjectPtr<UEquipmentSlotWidget> Slot_Chest;
+	UPROPERTY(meta = (BindWidget)) TObjectPtr<UEquipmentSlotWidget> Slot_Legs;
+	UPROPERTY(meta = (BindWidget)) TObjectPtr<UEquipmentSlotWidget> Slot_Feet;
+	UPROPERTY(meta = (BindWidget)) TObjectPtr<UEquipmentSlotWidget> Slot_Weapon;
+	UPROPERTY(meta = (BindWidget)) TObjectPtr<UEquipmentSlotWidget> Slot_OffHand;
+	UPROPERTY(meta = (BindWidget)) TObjectPtr<UEquipmentSlotWidget> Slot_Ring;
+	UPROPERTY(meta = (BindWidget)) TObjectPtr<UEquipmentSlotWidget> Slot_Trinket;
+	UPROPERTY(meta = (BindWidget)) TObjectPtr<UEquipmentSlotWidget> Slot_Lantern;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Equipment")
-	TSubclassOf<UEquipmentSlotWidget> SlotWidgetClass;
-	
 private:
-	UPROPERTY()
-	TArray<TObjectPtr<UEquipmentSlotWidget>> SlotWidgets;
-
-	UPROPERTY()
-	TObjectPtr<UDataTable> ItemDataTable;
+	UEquipmentSlotWidget* GetSlotWidget(EEquipmentSlot SlotType) const;
+	void BindSlotWidget(UEquipmentSlotWidget* Widget, EEquipmentSlot SlotType);
+	void OnSlotRightClicked(EEquipmentSlot SlotType);
 };

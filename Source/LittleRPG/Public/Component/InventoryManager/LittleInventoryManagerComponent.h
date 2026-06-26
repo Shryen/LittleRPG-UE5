@@ -3,11 +3,15 @@
 #include "Components/ActorComponent.h"
 #include "LittleInventoryManagerComponent.generated.h"
 
+struct FEquipmentDisplayPayload;
+enum class EEquipmentSlot : uint8;
+struct FInventoryDisplayPayload;
 struct FEquipmentSlot;
 class UDataTable;
 struct FInventorySlot;
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnInventorySlotChanged, const FInventorySlot&);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnSlotDisplayDirty, const FInventoryDisplayPayload&);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnEquipmentSlotDirty, const FEquipmentDisplayPayload&);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class LITTLERPG_API ULittleInventoryManagerComponent : public UActorComponent
@@ -16,11 +20,12 @@ class LITTLERPG_API ULittleInventoryManagerComponent : public UActorComponent
 
 public:
 	ULittleInventoryManagerComponent();
-
+	
+	// Inventory
 	void AddItemToInventory(const FName& ItemRowName, int32 Quantity);
 	void PrintInventory();
 
-	FOnInventorySlotChanged OnInventorySlotChanged;
+	FOnSlotDisplayDirty OnSlotDisplayDirty;
 
 	TArray<FInventorySlot>& GetInventory() {return Inventory;};
 
@@ -31,19 +36,44 @@ public:
 
 	UDataTable* GetItemDataTable() const { return ItemDataTable; }
 	
-
+	static const int32 MaxVisualSlots = 30;
+	
+	// Equipment
+	FOnEquipmentSlotDirty OnEquipmentSlotDirty;
+	void EquipItemFromInventory(int32 VisualSlotIndex);
+	void UnequipItem(EEquipmentSlot SlotType);
+	
+	UFUNCTION(Server, Reliable)
+	void Server_EquipItemFromInventory(int32 VisualSlotIndex);
+	
+	UFUNCTION(Server, Reliable)
+	void Server_UnequipItem(EEquipmentSlot SlotType);
+	const TArray<FEquipmentSlot>& GetEquipmentSlots() const { return EquipmentSlots; }
 private:
-	int32 NextSlotID = 1;
+	int32 NextSlotID  = 1;
+	int32 NextVisualIndex = 0;
 
-	UPROPERTY(VisibleAnywhere, Replicated)
+	// Inventory
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Inventory)
 	TArray<FInventorySlot> Inventory;
 	
-	UPROPERTY(ReplicatedUsing=OnRep_Equipment)
+	TArray<FInventorySlot> LastKnownInventory;
+	
+	// Equipment
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Equipment)
 	TArray<FEquipmentSlot> EquipmentSlots;
+ 
+	TArray<FEquipmentSlot> LastKnownEquipment;
+ 
+	FEquipmentSlot* FindEquipmentSlot(EEquipmentSlot SlotType);
 	
-	UFUNCTION()
-	void OnRep_Equipment();
-	
+	// Data Table
 	UPROPERTY(EditDefaultsOnly, Category = "Data")
 	TObjectPtr<UDataTable> ItemDataTable;
+	void BroadcastInventorySlotPayload(const FInventorySlot& Slot) const;
+	void BroadcastEquipmentSlotPayload(const FEquipmentSlot& Slot) const;
+	
+	//Rep notifies
+	UFUNCTION() void OnRep_Equipment();
+	UFUNCTION() void OnRep_Inventory();
 };

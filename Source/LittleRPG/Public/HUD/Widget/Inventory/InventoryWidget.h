@@ -4,11 +4,15 @@
 #include "HUD/Widget/LittleUserWidget.h"
 #include "InventoryWidget.generated.h"
 
+struct FInventoryDisplayPayload;
 struct FInventorySlot;
+class UEquipmentPanelWidget;
 class UInventoryItemWidget;
 class UUniformGridPanel;
 class UHorizontalBox;
 class UScrollBox;
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnInventoryItemRightClicked, int32 /* VisualSlotIndex */);
 
 UCLASS()
 class LITTLERPG_API UInventoryWidget : public ULittleUserWidget
@@ -17,7 +21,9 @@ class LITTLERPG_API UInventoryWidget : public ULittleUserWidget
 	
 public:
 	
-	void UpdateSlot(const FInventorySlot& Slot);
+	void UpdateFromPayload(const FInventoryDisplayPayload& Payload);
+	FOnInventoryItemRightClicked OnInventoryItemRightClicked;
+	UEquipmentPanelWidget* GetEquipmentPanel() const { return EquipmentPanelWidget; }
 
 protected:
 	
@@ -29,16 +35,18 @@ protected:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UUniformGridPanel> InventoryGridPanel;
 	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UEquipmentPanelWidget> EquipmentPanelWidget;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "LittleRPG|Inventory")
 	TSubclassOf<UInventoryItemWidget> InventoryItemWidgetClass;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "LittleRPG|Inventory")
+	int32 ColumnCount = 6;
 
 private:
 	UPROPERTY()
-	TObjectPtr<UScrollBox> InventoryScrollBox;
-	
-	UPROPERTY()
 	TMap<int32, UInventoryItemWidget*> SlotWidgets;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Data")
-	TObjectPtr<UDataTable> ItemDataTable;
+	void OnCellRightClicked(int32 VisualSlotIndex);
 };

@@ -4,6 +4,9 @@
 #include "HUD/Widget/LittleWidgetController.h"
 #include "InventoryWidgetController.generated.h"
 
+struct FInventoryDisplayPayload;
+struct FEquipmentDisplayPayload;
+enum class EEquipmentSlot : uint8;
 class UInventoryItemWidget;
 struct FInventorySlot;
 class ALittlePlayerState;
@@ -17,9 +20,6 @@ public:
 	virtual void SetWidget(ULittleUserWidget* InWidget) override;
 	UFUNCTION(BlueprintCallable)
 	void ToggleInventory();
-	
-	UFUNCTION()
-	void OnInventoryChanged(const FInventorySlot& SlotChanged);
 
 private:
 	UPROPERTY()
@@ -28,6 +28,11 @@ private:
 	
 	UPROPERTY()
 	TObjectPtr<ALittlePlayerState> LittlePlayerState;
+	
+	void OnSlotDisplayDirty(const FInventoryDisplayPayload& Payload);
+	void OnEquipmentSlotDirty(const FEquipmentDisplayPayload& Payload);
+	void OnInventoryItemRightClicked(int32 VisualSlotIndex);
+	void OnEquipmentSlotRightClicked(EEquipmentSlot SlotType);
 	
 	void ShowInventoryWidget();
 	void HideInventoryWidget();

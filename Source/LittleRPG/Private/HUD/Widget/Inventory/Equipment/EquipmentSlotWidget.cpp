@@ -1,32 +1,42 @@
 ﻿#include "HUD/Widget/Inventory/Equipment/EquipmentSlotWidget.h"
-#include "Engine/DataTable.h"
+
 #include "Components/Border.h"
 #include "Components/Image.h"
-#include "Data/ItemDataRow.h"
+#include "Data/EquipmentDisplayPayLoad.h"
+#include "Engine/DataTable.h"
 
-void UEquipmentSlotWidget::SetItem(FName ItemRowName)
+void UEquipmentSlotWidget::UpdateFromPayload(const FEquipmentDisplayPayload& Payload)
 {
-	if (ItemRowName.IsNone())
+	if (Payload.ItemRowName.IsNone())
 	{
-		ClearSlot();
+		bIsOccupied = false;
+		if (ItemIcon)         ItemIcon->SetBrushFromTexture(nullptr);
+		if (BackgroundBorder) BackgroundBorder->SetBrushColor(FLinearColor(0.05f, 0.05f, 0.05f, 1.f));
 		return;
 	}
 	
-	if (!ItemDataTable)
-		return;
-	
-	const FItemDataRow* Row = nullptr;
-	
-	Row = ItemDataTable->FindRow<FItemDataRow>(ItemRowName, "");
-	if (!Row)
-		return;
-	
-	if (ItemIcon)
-		ItemIcon->SetBrushFromTexture(Row->ItemIcon.LoadSynchronous());
+	bIsOccupied = true;
+	if (ItemIcon) ItemIcon->SetBrushFromTexture(Payload.ItemIcon);
+	if (BackgroundBorder) BackgroundBorder->SetBrushColor(FLinearColor(0.15f, 0.12f, 0.08f, 1.f)); // slight gold tint when occupied
 }
 
-void UEquipmentSlotWidget::ClearSlot()
+void UEquipmentSlotWidget::NativeConstruct()
 {
-	ItemIcon->SetBrushFromTexture(nullptr);
-	BackgroundBorder->SetBrushColor(FColor::Black);
+	Super::NativeConstruct();
+	bIsOccupied = false;
+	if (ItemIcon)         ItemIcon->SetBrushFromTexture(nullptr);
+	if (BackgroundBorder) BackgroundBorder->SetBrushColor(FLinearColor(0.05f, 0.05f, 0.05f, 1.f));
+}
+
+FReply UEquipmentSlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+ 
+	if (InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton && bIsOccupied)
+	{
+		OnEquipmentSlotRightClicked.Broadcast(SlotType);
+		UE_LOG(LogTemp, Warning, TEXT("UEquipmentSlotWidget: right-clicked slot [%d]"), (uint8)SlotType);
+		return FReply::Handled();
+	}
+	return FReply::Unhandled();
 }
