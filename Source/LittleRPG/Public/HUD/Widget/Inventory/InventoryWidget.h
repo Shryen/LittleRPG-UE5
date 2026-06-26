@@ -4,12 +4,11 @@
 #include "HUD/Widget/LittleUserWidget.h"
 #include "InventoryWidget.generated.h"
 
-
 struct FInventorySlot;
 class UInventoryItemWidget;
-class UItemData;
 class UUniformGridPanel;
 class UHorizontalBox;
+class UScrollBox;
 
 UCLASS()
 class LITTLERPG_API UInventoryWidget : public ULittleUserWidget
@@ -17,12 +16,13 @@ class LITTLERPG_API UInventoryWidget : public ULittleUserWidget
 	GENERATED_BODY()
 	
 public:
-	void AddItem(const FInventorySlot& InventorySlot);
-	void ClearItems();
+	
 	void UpdateSlot(const FInventorySlot& Slot);
 
-
 protected:
+	
+	virtual void NativeConstruct() override;
+
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UHorizontalBox> InventoryContainerBox;
 	
@@ -31,9 +31,14 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "LittleRPG|Inventory")
 	TSubclassOf<UInventoryItemWidget> InventoryItemWidgetClass;
-	
+
 private:
-	int32 ColumnCount = 4;
 	UPROPERTY()
-	TMap<int32, UInventoryItemWidget*> SlotWidgetMap;
+	TObjectPtr<UScrollBox> InventoryScrollBox;
+	
+	UPROPERTY()
+	TMap<int32, UInventoryItemWidget*> SlotWidgets;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Data")
+	TObjectPtr<UDataTable> ItemDataTable;
 };

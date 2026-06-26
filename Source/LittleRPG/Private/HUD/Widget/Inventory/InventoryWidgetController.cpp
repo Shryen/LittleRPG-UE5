@@ -1,4 +1,5 @@
 ﻿#include "HUD/Widget/Inventory/InventoryWidgetController.h"
+
 #include "Component/InventoryManager/LittleInventoryManagerComponent.h"
 #include "Data/FInventorySlot.h"
 #include "HUD/Widget/Inventory/InventoryWidget.h"
@@ -14,6 +15,8 @@ void UInventoryWidgetController::SetWidget(ULittleUserWidget* InWidget)
 		return;
 	}
 	InventoryWidget->SetVisibility(ESlateVisibility::Collapsed);
+	LittlePlayerState = Cast<ALittlePlayerState>(PlayerState);
+	BindDependencies();
 }
 
 void UInventoryWidgetController::ToggleInventory()
@@ -21,17 +24,14 @@ void UInventoryWidgetController::ToggleInventory()
 	bIsOpen ? HideInventoryWidget() : ShowInventoryWidget();
 }
 
-void UInventoryWidgetController::OnSlotChanged(const FInventorySlot& InventorySlot)
+void UInventoryWidgetController::BindDependencies()
 {
-	if (!InventoryWidget) return;
-	
-	if (InventorySlot.SlotID == INDEX_NONE)
-	{
-		InventoryWidget->ClearItems();
-		return;
-	}
-	
-	InventoryWidget->UpdateSlot(InventorySlot);
+	LittlePlayerState->GetInventoryManager()->OnInventorySlotChanged.AddUObject(this, &UInventoryWidgetController::OnInventoryChanged);
+}
+
+void UInventoryWidgetController::OnInventoryChanged(const FInventorySlot& SlotChanged)
+{
+	InventoryWidget->UpdateSlot(SlotChanged);
 }
 
 void UInventoryWidgetController::ShowInventoryWidget() 
@@ -41,6 +41,12 @@ void UInventoryWidgetController::ShowInventoryWidget()
 	
 	InventoryWidget->SetVisibility(ESlateVisibility::Visible);
 	bIsOpen = true;
+	FInputModeGameAndUI InputMode;
+	InputMode.SetWidgetToFocus(InventoryWidget->TakeWidget());
+	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+
+	PlayerController->SetInputMode(InputMode);
+	PlayerController->bShowMouseCursor = true;
 }
 
 void UInventoryWidgetController::HideInventoryWidget() 
@@ -50,31 +56,9 @@ void UInventoryWidgetController::HideInventoryWidget()
 	
 	InventoryWidget->SetVisibility(ESlateVisibility::Collapsed);
 	bIsOpen = false;
+	
+	FInputModeGameOnly InputMode;
+	PlayerController->SetInputMode(InputMode);
+	PlayerController->bShowMouseCursor = false;
 }
 
-void UInventoryWidgetController::BindPlayerStateToInventory(ALittlePlayerState* PS)
-{
-	PlayerState = PS;
-	if(!PS)
-		return;
-
-	if (ULittleInventoryManagerComponent* Manager = PS->GetInventoryManager())
-	{
-		Manager->OnInventorySlotChanged.AddUObject(this, &UInventoryWidgetController::OnSlotChanged);
-		RefreshInventory();
-	}
-}
-
-void UInventoryWidgetController::RefreshInventory()
-{
-	ALittlePlayerState* PS = Cast<ALittlePlayerState>(PlayerState);
-	if (!PS) return;
-
-	ULittleInventoryManagerComponent* Manager = PS->GetInventoryManager();
-	if (!Manager) return;
-
-	for (const FInventorySlot& Slot : Manager->GetInventory())
-	{
-		OnSlotChanged(Slot);
-	}
-}

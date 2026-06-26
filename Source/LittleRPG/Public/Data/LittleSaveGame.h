@@ -13,7 +13,7 @@ struct FSavedInventorySlot
 	int32 SlotID = INDEX_NONE;
 	
 	UPROPERTY()
-	FSoftObjectPath ItemDataPath; 
+	FName ItemRowName; 
 	
 	UPROPERTY()
 	int32 Quantity = 0;

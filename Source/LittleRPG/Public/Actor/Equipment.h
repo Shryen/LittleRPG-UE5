@@ -1,24 +1,19 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "GameplayTagContainer.h"
+#include "PickupObject.h"
 #include "GameFramework/Actor.h"
 #include "Equipment.generated.h"
 
 class UBoxComponent;
-class UItemData;
 
 UCLASS()
-class LITTLERPG_API AEquipment : public AActor
+class LITTLERPG_API AEquipment : public APickupObject
 {
 	GENERATED_BODY()
 
 public:
 	AEquipment();
-
-	const FGameplayTag& GetEquippedStateTag() const { return EquippedStateTag; };
-	
-	void TurnOffCollision();
 	
 protected:
 	virtual void BeginPlay() override;
@@ -36,10 +31,5 @@ private:
 	TObjectPtr<UStaticMeshComponent> StaticMesh;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Equipment")
-	TObjectPtr<UItemData> ItemData;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "Equipment")
 	TObjectPtr<UBoxComponent> BoxCollision;
-	
-	FGameplayTag EquippedStateTag;
 };

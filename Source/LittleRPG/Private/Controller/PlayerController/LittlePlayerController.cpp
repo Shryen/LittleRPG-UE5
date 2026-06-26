@@ -176,6 +176,9 @@ void ALittlePlayerController::HandleInventory(const FInputActionValue& Value)
 
 void ALittlePlayerController::HandleInteract(const FInputActionValue& Value)
 {
+	ALittleHUD* LittleHUD = Cast<ALittleHUD>(GetHUD());
+	//if (LittleHUD->GetInventoryWidgetController()->IsOpen())
+	//	return;
 	FVector CameraLocation;
 	FRotator CameraRotation;
 	GetPlayerViewPoint(CameraLocation, CameraRotation);

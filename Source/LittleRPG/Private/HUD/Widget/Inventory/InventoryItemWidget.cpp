@@ -3,23 +3,38 @@
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
 #include "Data/FInventorySlot.h"
-#include "Data/ItemData.h"
+#include "Data/ItemDataRow.h"
+#include "Engine/DataTable.h"
 
-void UInventoryItemWidget::SetItemData(const UItemData* Item)
+FReply UInventoryItemWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	if (!Item) return;
+	Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+ 
+	if (InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
+	{
+		OnItemClicked.Broadcast(CachedSlotID);
+        UE_LOG(LogTemp, Warning, TEXT("Item was clicked [%d]"), CachedSlotID)
+		return FReply::Handled();
+	}
+	return FReply::Unhandled();
+}
+
+void UInventoryItemWidget::SetItemRow(const FItemDataRow* Row, int32 Quantity)
+{
+	if (!Row) return;
 	
 	if (!ItemIcon || !ItemQuantity)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UInventoryItemWidget::SetItemData: No image or text block set for widget!"));
 		return;
 	}
+	UE_LOG(LogTemp, Warning, TEXT("Loading icon: %s"), *Row->ItemIcon.ToSoftObjectPath().ToString());
 
 	if (ItemQuantity)
-		ItemQuantity->SetText(FText::AsNumber(Item->Quantity));
+		ItemQuantity->SetText(FText::AsNumber(Quantity));
 
-	if (ItemIcon && Item->ItemIcon)
-		ItemIcon->SetBrushFromTexture(Item->ItemIcon);
+	if (ItemIcon && !Row->ItemIcon.IsNull())
+		ItemIcon->SetBrushFromTexture(Row->ItemIcon.LoadSynchronous());
 }
 
 void UInventoryItemWidget::UpdateQuantity(const FInventorySlot& InventorySlot)
@@ -43,9 +58,19 @@ void UInventoryItemWidget::UpdateQuantity(const FInventorySlot& InventorySlot)
 	ItemQuantity->SetText(FText::AsNumber(InventorySlot.Quantity));
 }
 
-void UInventoryItemWidget::InitSlot(const FInventorySlot& InventorySlot)
+void UInventoryItemWidget::InitSlot(const int32 SlotIndex)
 {
-	CachedSlotID = InventorySlot.SlotID;
-	SetItemData(InventorySlot.ItemData);
+	CachedSlotID = SlotIndex;
+}
+
+void UInventoryItemWidget::UpdateSlot(const FInventorySlot& InventorySlot)
+{
+	const FItemDataRow* Row = nullptr;
+	if (ItemDataTable)
+	{
+		Row = ItemDataTable->FindRow<FItemDataRow>(InventorySlot.ItemRowName, "");
+	}
+	SetItemRow(Row, InventorySlot.Quantity);
 	UpdateQuantity(InventorySlot);
 }
+

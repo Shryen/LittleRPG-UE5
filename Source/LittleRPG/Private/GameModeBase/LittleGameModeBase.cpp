@@ -4,7 +4,6 @@
 #include "Component/InventoryManager/LittleInventoryManagerComponent.h"
 #include "Controller/PlayerController/LittlePlayerController.h"
 #include "Data/FInventorySlot.h"
-#include "Data/ItemData.h"
 #include "Data/LittleSaveGame.h"
 #include "Kismet/GameplayStatics.h"
 #include "PlayerState/LittlePlayerState.h"
@@ -26,11 +25,11 @@ void ALittleGameModeBase::SaveGame() const
 
 	for (const FInventorySlot& InventorySlot : LPS->GetInventoryManager()->GetInventory())
 	{
-		if (!InventorySlot.ItemData) continue;
-		
+		if (InventorySlot.ItemRowName.IsNone()) continue;
+
 		FSavedInventorySlot Saved;
 		Saved.SlotID = InventorySlot.SlotID;
-		Saved.ItemDataPath = FSoftObjectPath(InventorySlot.ItemData);
+		Saved.ItemRowName = InventorySlot.ItemRowName;
 		Saved.Quantity     = InventorySlot.Quantity;
 		
 		SaveData->SavedInventory.Add(Saved);
@@ -53,24 +52,6 @@ void ALittleGameModeBase::LoadGame(ALittlePlayerState* PlayerState) const
 	ULittleSaveGame* SaveData = Cast<ULittleSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveSlotName, UserIndex));
 	if (!SaveData) return;
 	
-	PlayerState->GetInventoryManager()->SetNextSlotID(SaveData->SavedNextSlotID);
-
-	for (const FSavedInventorySlot& SavedSlot : SaveData->SavedInventory)
-	{
-		UItemData* Item = Cast<UItemData>(SavedSlot.ItemDataPath.TryLoad());
-		if (!Item)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Item Data is null"));
-			continue;
-		}
-
-		FInventorySlot NewSlot;
-		NewSlot.SlotID    = SavedSlot.SlotID;
-		NewSlot.ItemData  = Item;
-		NewSlot.Quantity  = SavedSlot.Quantity;
-		PlayerState->GetInventoryManager()->GetInventory().Add(NewSlot);
-		PlayerState->GetInventoryManager()->Server_OnSlotChanged(NewSlot);
-	}
 }
 
 void ALittleGameModeBase::BeginPlay()

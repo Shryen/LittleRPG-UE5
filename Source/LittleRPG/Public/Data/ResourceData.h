@@ -5,7 +5,6 @@
 #include "Engine/DataAsset.h"
 #include "ResourceData.generated.h"
 
-class UItemData;
 /**
  * 
  */
@@ -21,5 +20,5 @@ public:
 	UTexture2D* ResourceIcon;
         
 	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UItemData> DropsItem;
+	FName DropsItemRowName;
 };

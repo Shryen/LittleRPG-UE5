@@ -3,12 +3,11 @@
 #include "Components/ActorComponent.h"
 #include "LittleInventoryManagerComponent.generated.h"
 
-class AActor;
-class UItemData;
+struct FEquipmentSlot;
+class UDataTable;
 struct FInventorySlot;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnInventorySlotChanged, const FInventorySlot&);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnEquippedItemChanged, UItemData*);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class LITTLERPG_API ULittleInventoryManagerComponent : public UActorComponent
@@ -18,51 +17,33 @@ class LITTLERPG_API ULittleInventoryManagerComponent : public UActorComponent
 public:
 	ULittleInventoryManagerComponent();
 
-	void AddItemToInventory(UItemData* Item);
-
-	UFUNCTION(BlueprintCallable)
-	void TestClearInventory();
-
-	UFUNCTION(Server, Reliable)
-	void Server_EquipItem(UItemData* Item, AActor* SpawnedActor);
-
-	UFUNCTION(Server, Reliable)
-	void Server_UnequipItem();
-
+	void AddItemToInventory(const FName& ItemRowName, int32 Quantity);
 	void PrintInventory();
 
 	FOnInventorySlotChanged OnInventorySlotChanged;
-	FOnEquippedItemChanged OnEquippedItemChanged;
 
 	TArray<FInventorySlot>& GetInventory() {return Inventory;};
-
-	UItemData* GetEquippedItem() const { return EquippedItem; }
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 	int32 GetNextSlotID() const {return NextSlotID;};
 	void SetNextSlotID(const int32 NewNextSlotID) {NextSlotID = NewNextSlotID;};
 
-	UFUNCTION(NetMulticast, Reliable)
-	void Server_OnSlotChanged(const FInventorySlot& Slot);
-
-protected:
-	virtual void BeginPlay() override;
+	UDataTable* GetItemDataTable() const { return ItemDataTable; }
+	
 
 private:
 	int32 NextSlotID = 1;
 
-	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Inventory)
+	UPROPERTY(VisibleAnywhere, Replicated)
 	TArray<FInventorySlot> Inventory;
-
+	
+	UPROPERTY(ReplicatedUsing=OnRep_Equipment)
+	TArray<FEquipmentSlot> EquipmentSlots;
+	
 	UFUNCTION()
-	void OnRep_Inventory();
-
-	UPROPERTY(ReplicatedUsing = OnRep_EquippedItem)
-	TObjectPtr<UItemData> EquippedItem;
-
-	TObjectPtr<AActor> EquippedActor;
-
-	UFUNCTION()
-	void OnRep_EquippedItem();
+	void OnRep_Equipment();
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Data")
+	TObjectPtr<UDataTable> ItemDataTable;
 };

@@ -19,7 +19,6 @@ public:
 	void HideHarvestedMesh();
 	virtual void Interact(AActor* Interactor) override;
 	
-	
 	UResourceData* GetResourceType() const { return ResourceType; }
 
 protected:

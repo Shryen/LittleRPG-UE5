@@ -6,7 +6,6 @@
 #include "PickupObject.generated.h"
 
 class USphereComponent;
-class UItemData;
 
 UCLASS()
 class LITTLERPG_API APickupObject : public AInteractableObject
@@ -19,8 +18,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LittleRPG | Data")
-	TObjectPtr<UItemData> ItemData;
+	UPROPERTY(EditDefaultsOnly)
+	FName ItemRowName;
 	
 private:
 	UPROPERTY(EditDefaultsOnly)
@@ -34,6 +33,8 @@ private:
 	bool bFromSweep,
 	const FHitResult& SweepResult);
 	
-	
 	FVector InitialLocation;
+	
+	UPROPERTY(EditDefaultsOnly)
+	int32 Quantity{1};
 };

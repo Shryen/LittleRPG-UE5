@@ -46,8 +46,8 @@ void AResourceNode::Interact(AActor* Interactor)
 	ALittlePlayerState* PS = Pawn->GetPlayerState<ALittlePlayerState>();
 	if (!PS) return;
 
-	if (!ResourceType || !ResourceType->DropsItem) return;
-	PS->GetInventoryManager()->AddItemToInventory(ResourceType->DropsItem);
+	if (!ResourceType || ResourceType->DropsItemRowName.IsNone()) return;
+	PS->GetInventoryManager()->AddItemToInventory(ResourceType->DropsItemRowName, ResourceAmount);
 
 	if (Health <= 0.f)
 		HideHarvestedMesh();

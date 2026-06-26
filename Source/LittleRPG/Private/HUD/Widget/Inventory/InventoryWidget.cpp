@@ -1,43 +1,38 @@
 ﻿#include "HUD/Widget/Inventory/InventoryWidget.h"
-#include "Components/TextBlock.h"
 #include "Components/UniformGridPanel.h"
+#include "Data/FInventorySlot.h"
 #include "HUD/Widget/Inventory/InventoryItemWidget.h"
 
-void UInventoryWidget::AddItem(const FInventorySlot& InventorySlot)
-{
-	if (!InventoryGridPanel || !InventoryItemWidgetClass) return;
-	
-	UInventoryItemWidget* ItemWidget = CreateWidget<UInventoryItemWidget>(this, InventoryItemWidgetClass);
-	if (!ItemWidget) return;
-	
-	int32 Index = InventoryGridPanel->GetChildrenCount();
-	int32 Column = Index % ColumnCount;
-	int32 Row = Index / ColumnCount;
-	
-	ItemWidget->InitSlot(InventorySlot);
-	SlotWidgetMap.Add(InventorySlot.SlotID, ItemWidget);
-    InventoryGridPanel->AddChildToUniformGrid(ItemWidget, Row, Column);
-}
 
-void UInventoryWidget::ClearItems()
+void UInventoryWidget::UpdateSlot(const FInventorySlot& InSlot)
 {
-	if (!InventoryGridPanel)
-		return;
-		
-	InventoryGridPanel->ClearChildren();
-	SlotWidgetMap.Empty();
-}
-
-void UInventoryWidget::UpdateSlot(const FInventorySlot& InventorySlot)
-{
-	UInventoryItemWidget** Found = SlotWidgetMap.Find(InventorySlot.SlotID);
-	
-	if (Found)
+	UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::UpdateSlot: trying to update: InSlot"));
+	if (UInventoryItemWidget** Widget = SlotWidgets.Find(InSlot.SlotID))
 	{
-		(*Found)->InitSlot(InventorySlot);
+		(*Widget)->UpdateSlot(InSlot);
+		UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::UpdateSlot: Slot changed"));
 	}
-	else
+}
+
+void UInventoryWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	if (InventoryScrollBox || !InventoryGridPanel)
+		return;
+
+	const int32 MaxSlots = 30; // or from player data
+
+	for (int32 i = 0; i < MaxSlots; i++)
 	{
-		AddItem(InventorySlot); 
+		UInventoryItemWidget* SlotWidget =
+			CreateWidget<UInventoryItemWidget>(GetWorld(), InventoryItemWidgetClass);
+
+		SlotWidget->ItemDataTable = ItemDataTable;
+		SlotWidget->InitSlot(i);
+
+		InventoryGridPanel->AddChildToUniformGrid(SlotWidget, i / 6, i % 6);
+
+		SlotWidgets.Add(i, SlotWidget);
 	}
 }

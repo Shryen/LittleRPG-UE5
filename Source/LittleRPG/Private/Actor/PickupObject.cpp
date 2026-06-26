@@ -47,6 +47,7 @@ void APickupObject::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* Other
 {
 	if (!HasAuthority())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("No authority!"));
 		return;
 	}
 	
@@ -54,12 +55,12 @@ void APickupObject::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* Other
 	if (Character)
 	{
 		ALittlePlayerState* PlayerState = Cast<ALittlePlayerState>(Character->GetPlayerState());
+		Interact(Character);
 		if (PlayerState)
 		{
-			PlayerState->GetInventoryManager()->AddItemToInventory(ItemData);
+			PlayerState->GetInventoryManager()->AddItemToInventory(ItemRowName, Quantity);
 			Destroy();
 		}
-		Interact(Character);
 	}
 }
 
