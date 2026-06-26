@@ -1,7 +1,7 @@
 ﻿#include "HUD/Widget/Inventory/InventoryWidgetController.h"
 
 #include "Component/InventoryManager/LittleInventoryManagerComponent.h"
-#include "Data/EquipmentDisplayPayLoad.h"
+#include "Data/Equipment/EquipmentDisplayPayLoad.h"
 #include "HUD/Widget/Inventory/InventoryWidget.h"
 #include "HUD/Widget/Inventory/Equipment/EquipmentPanelWidget.h"
 #include "PlayerState/LittlePlayerState.h"
@@ -27,13 +27,18 @@ void UInventoryWidgetController::ToggleInventory()
 
 void UInventoryWidgetController::BindDependencies()
 {
-    LittlePlayerState = PlayerController ? PlayerController->GetPlayerState<ALittlePlayerState>() : nullptr;
+	APawn* Pawn = PlayerController ? PlayerController->GetPawn() : nullptr;
+	LittlePlayerState = Pawn ? Cast<ALittlePlayerState>(Pawn->GetPlayerState()) : nullptr;
 	if (!LittlePlayerState) { UE_LOG(LogTemp, Error, TEXT("[BindDependencies] LittlePlayerState is NULL")); return; }
+	
 	ULittleInventoryManagerComponent* Manager = LittlePlayerState->GetInventoryManager();
 	if (!Manager) { UE_LOG(LogTemp, Error, TEXT("[BindDependencies] Manager is NULL")); return; }
+	
 	UE_LOG(LogTemp, Warning, TEXT("[BindDependencies] Binding OK"));
+	
 	Manager->OnSlotDisplayDirty.AddUObject(this, &UInventoryWidgetController::OnSlotDisplayDirty);
 	Manager->OnEquipmentSlotDirty.AddUObject(this, &UInventoryWidgetController::OnEquipmentSlotDirty);
+	
 	InventoryWidget->OnInventoryItemRightClicked.AddUObject(this, &UInventoryWidgetController::OnInventoryItemRightClicked);
 	InventoryWidget->GetEquipmentPanel()->OnEquipmentSlotRightClicked.AddUObject(this, &UInventoryWidgetController::OnEquipmentSlotRightClicked);
 }

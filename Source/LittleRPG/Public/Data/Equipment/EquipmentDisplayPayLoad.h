@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "Data/EquipmentSlot.h"
+#include "Data/Equipment/EquipmentSlot.h"
 #include "EquipmentDisplayPayload.generated.h"
 
 USTRUCT(BlueprintType)
@@ -14,5 +14,5 @@ struct FEquipmentDisplayPayload
 	UPROPERTY(BlueprintReadOnly) FName ItemRowName;
 
 	UPROPERTY(BlueprintReadOnly) FText ItemName;
-	UPROPERTY(BlueprintReadOnly) UTexture2D* ItemIcon = nullptr;
+	UPROPERTY(BlueprintReadOnly) TSoftObjectPtr<UTexture2D> ItemIcon = nullptr;
 };

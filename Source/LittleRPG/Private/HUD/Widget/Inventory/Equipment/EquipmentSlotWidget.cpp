@@ -2,7 +2,7 @@
 
 #include "Components/Border.h"
 #include "Components/Image.h"
-#include "Data/EquipmentDisplayPayLoad.h"
+#include "Data/Equipment/EquipmentDisplayPayLoad.h"
 #include "Engine/DataTable.h"
 
 void UEquipmentSlotWidget::UpdateFromPayload(const FEquipmentDisplayPayload& Payload)
@@ -16,7 +16,7 @@ void UEquipmentSlotWidget::UpdateFromPayload(const FEquipmentDisplayPayload& Pay
 	}
 	
 	bIsOccupied = true;
-	if (ItemIcon) ItemIcon->SetBrushFromTexture(Payload.ItemIcon);
+	if (ItemIcon) ItemIcon->SetBrushFromSoftTexture(Payload.ItemIcon);
 	if (BackgroundBorder) BackgroundBorder->SetBrushColor(FLinearColor(0.15f, 0.12f, 0.08f, 1.f)); // slight gold tint when occupied
 }
 

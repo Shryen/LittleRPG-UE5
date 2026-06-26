@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "Data/EquipmentSlot.h"
+#include "Data/Equipment/EquipmentSlot.h"
 #include "HUD/Widget/LittleUserWidget.h"
 #include "EquipmentSlotWidget.generated.h"
 

@@ -1,8 +1,8 @@
 ﻿#include "HUD/Widget/Inventory/Equipment/EquipmentPanelWidget.h"
 
 #include "Components/VerticalBox.h"
-#include "Data/EquipmentDisplayPayLoad.h"
-#include "Data/EquipmentSlot.h"
+#include "Data/Equipment/EquipmentDisplayPayLoad.h"
+#include "Data/Equipment/EquipmentSlot.h"
 #include "HUD/Widget/Inventory/Equipment/EquipmentSlotWidget.h"
 
 void UEquipmentPanelWidget::UpdateFromPayload(const FEquipmentDisplayPayload& Payload)

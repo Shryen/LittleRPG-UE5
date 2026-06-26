@@ -1,4 +1,6 @@
 ﻿#pragma once
+
+#include "Net/Serialization/FastArraySerializer.h"
 #include "EquipmentSlot.generated.h"
 
 UENUM(BlueprintType)
@@ -10,15 +12,13 @@ enum class EEquipmentSlot : uint8
 
 };
 
-
 USTRUCT(BlueprintType)
-struct FEquipmentSlot
+struct FEquipmentSlot : public FFastArraySerializerItem
 {
 	GENERATED_BODY()
 	FEquipmentSlot() : SlotType(EEquipmentSlot::Empty), InventorySlotID(INDEX_NONE){}
 	FEquipmentSlot(const EEquipmentSlot InType) : SlotType(InType) {}
-
-
+	
 	UPROPERTY()
 	EEquipmentSlot SlotType = EEquipmentSlot::Empty;
 
@@ -27,4 +27,13 @@ struct FEquipmentSlot
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName ItemRowName = NAME_None;
+	
+	bool operator==(const FEquipmentSlot& Other) const
+	{
+		return SlotType == Other.SlotType
+			&& ItemRowName == Other.ItemRowName;
+	}
+
+	void PostReplicatedAdd(const struct FEquipmentArray& InArraySerializer);
+	void PostReplicatedChange(const struct FEquipmentArray& InArraySerializer);
 };

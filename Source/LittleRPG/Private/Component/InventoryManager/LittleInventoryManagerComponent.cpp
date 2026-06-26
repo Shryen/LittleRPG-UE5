@@ -1,21 +1,47 @@
 ﻿#include "Component/InventoryManager/LittleInventoryManagerComponent.h"
-
-#include "Data/EquipmentDisplayPayLoad.h"
-#include "Data/FInventorySlot.h"
-#include "Data/ItemDataRow.h"
-#include "Data/InventoryDisplayPayLoad.h"
+#include "Data/Equipment/EquipmentDisplayPayLoad.h"
+#include "Data/Equipment/EquipmentSlot.h"
+#include "Data/Equipment/FEquipmentArray.h"
+#include "Data/Inventory/FInventoryArray.h"
+#include "Data/Inventory/FInventorySlot.h"
+#include "Data/Inventory/ItemDataRow.h"
+#include "Data/Inventory/InventoryDisplayPayLoad.h"
 #include "Net/UnrealNetwork.h"
+
+/* FInventorySlot callbacks */
+
+void FInventorySlot::PostReplicatedAdd(const FInventoryArray& InArraySerializer)
+{
+	if (ULittleInventoryManagerComponent* Comp = InArraySerializer.OwnerComponent.Get())
+		Comp->NotifyInventorySlotChanged(*this);
+}
+
+void FInventorySlot::PostReplicatedChange(const FInventoryArray& InArraySerializer)
+{
+	if (ULittleInventoryManagerComponent* Comp = InArraySerializer.OwnerComponent.Get())
+		Comp->NotifyInventorySlotChanged(*this);
+}
+
+/* FEquipmentSlot callbacks */
+
+void FEquipmentSlot::PostReplicatedAdd(const FEquipmentArray& InArraySerializer)
+{
+	if (auto* Comp = InArraySerializer.OwnerComponent.Get())
+		Comp->NotifyEquipmentSlotChanged(*this);
+}
+
+void FEquipmentSlot::PostReplicatedChange(const FEquipmentArray& InArraySerializer)
+{
+	if (auto* Comp = InArraySerializer.OwnerComponent.Get())
+		Comp->NotifyEquipmentSlotChanged(*this);
+}
+
+// Callbacks end
 
 ULittleInventoryManagerComponent::ULittleInventoryManagerComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 	SetIsReplicatedByDefault(true);
-	
-	const uint8 SlotCount = static_cast<uint8>(EEquipmentSlot::Count);
-	EquipmentSlots.SetNum(SlotCount);
-	for (uint8 i = 0; i < SlotCount; i++)
-		EquipmentSlots[i] = FEquipmentSlot(static_cast<EEquipmentSlot>(i));
-	
 }
 
 void ULittleInventoryManagerComponent::AddItemToInventory(const FName& ItemRowName, int32 Quantity)
@@ -29,8 +55,9 @@ void ULittleInventoryManagerComponent::AddItemToInventory(const FName& ItemRowNa
 	if (!Row) return;
 
 	int32 Remaining = Quantity;
+	bool bArraySizeChanged = false;
 
-	for (FInventorySlot& Slot : Inventory)
+	for (FInventorySlot& Slot : Inventory.Items)
 	{
 		if (Slot.ItemRowName != ItemRowName)
 			continue;
@@ -42,23 +69,28 @@ void ULittleInventoryManagerComponent::AddItemToInventory(const FName& ItemRowNa
 		Slot.Quantity += ToAdd;
 		Remaining     -= ToAdd;
 		
-		BroadcastInventorySlotPayload(Slot);
+		Inventory.MarkItemDirty(Slot);
 		
 		if (Remaining <= 0) return;
 	}
 
 	while (Remaining > 0)
 	{
-		FInventorySlot NewSlot;
+        FInventorySlot& NewSlot = Inventory.Items.AddDefaulted_GetRef();
 		NewSlot.SlotID = NextSlotID++;
 		NewSlot.ItemRowName = ItemRowName;
 		NewSlot.Quantity = FMath::Min(Remaining, Row->MaxStack);
 		NewSlot.VisualSlotIndex = NextVisualIndex++;
 		
-		Inventory.Add(NewSlot);
+		// Inventory.Items.Add(NewSlot); AddDefaulted_GetRef adds the item to the inventory, don't add again
 		Remaining -= NewSlot.Quantity;
-		
-		BroadcastInventorySlotPayload(NewSlot);
+		bArraySizeChanged = true;
+	}
+	
+	if (bArraySizeChanged)
+	{
+		// When elemetn been added or removed must mark the array
+		Inventory.MarkArrayDirty();
 	}
 	
 	PrintInventory();
@@ -66,7 +98,7 @@ void ULittleInventoryManagerComponent::AddItemToInventory(const FName& ItemRowNa
 
 void ULittleInventoryManagerComponent::PrintInventory()
 {
-	for (const FInventorySlot& Slot : Inventory)
+	for (const FInventorySlot& Slot : Inventory.Items)
 		UE_LOG(LogTemp, Warning, TEXT("[Visual %d | ID %d] %s x%d"),
 					Slot.VisualSlotIndex, Slot.SlotID, *Slot.ItemRowName.ToString(), Slot.Quantity);
 }
@@ -97,7 +129,7 @@ void ULittleInventoryManagerComponent::EquipItemFromInventory(int32 VisualSlotIn
 	if (!GetOwner()->HasAuthority()) { UE_LOG(LogTemp, Error, TEXT("[EquipItemFromInventory] NO AUTHORITY")); return; }
 	if (!ItemDataTable) { UE_LOG(LogTemp, Error, TEXT("[EquipItemFromInventory] ItemDataTable is NULL")); return; }
 	
-	FInventorySlot* InvSlot = Inventory.FindByPredicate(
+	FInventorySlot* InvSlot = Inventory.Items.FindByPredicate(
 		[VisualSlotIndex](const FInventorySlot& S) { return S.VisualSlotIndex == VisualSlotIndex; });
 	
 	if (!InvSlot || InvSlot->ItemRowName.IsNone() || InvSlot->Quantity <= 0)
@@ -116,22 +148,21 @@ void ULittleInventoryManagerComponent::EquipItemFromInventory(int32 VisualSlotIn
 	FEquipmentSlot* EquipSlot = FindEquipmentSlot(Row->EquipmentSlot);
 	if (!EquipSlot) return;
 	
-	// Get what we want to equip
 	const FName ItemToEquip     = InvSlot->ItemRowName;
 	const FName PreviouslyEquip = EquipSlot->ItemRowName;
 	
 	if (!PreviouslyEquip.IsNone())
 	{
 		InvSlot->ItemRowName = PreviouslyEquip;
-		InvSlot->Quantity    = 1; // equipment is always 1, cannot stack
+		InvSlot->Quantity    = 1;
 	}else {
 		InvSlot->ItemRowName = NAME_None;
-		InvSlot->Quantity    = 0; // This tells the widget to hide
+		InvSlot->Quantity    = 0;
 	}
-	BroadcastInventorySlotPayload(*InvSlot);
+	Inventory.MarkItemDirty(*InvSlot);
 	
 	EquipSlot->ItemRowName = ItemToEquip;
-	BroadcastEquipmentSlotPayload(*EquipSlot);
+	EquipmentSlots.MarkItemDirty(*EquipSlot);
 }
 
 void ULittleInventoryManagerComponent::UnequipItem(EEquipmentSlot SlotType)
@@ -145,65 +176,18 @@ void ULittleInventoryManagerComponent::UnequipItem(EEquipmentSlot SlotType)
  
 	AddItemToInventory(EquipSlot->ItemRowName, 1);
 	EquipSlot->ItemRowName = NAME_None;
-	BroadcastEquipmentSlotPayload(*EquipSlot);
-}
-
-
-void ULittleInventoryManagerComponent::OnRep_Equipment()
-{
-	for (const FEquipmentSlot& New : EquipmentSlots)
-	{
-		const FEquipmentSlot* Old = LastKnownEquipment.FindByPredicate(
-			[&](const FEquipmentSlot& S) { return S.SlotType == New.SlotType; });
- 
-		if (!Old || Old->ItemRowName != New.ItemRowName)
-			BroadcastEquipmentSlotPayload(New);
-	}
- 
-	LastKnownEquipment = EquipmentSlots;
-}
-
-void ULittleInventoryManagerComponent::OnRep_Inventory()
-{
-	for (const FInventorySlot& NewSlot : Inventory)
-	{ 
-		// FindByPredicate for custom logic, this case: SlotID
-		const FInventorySlot* OldSlot = LastKnownInventory.FindByPredicate(
-			[&](const FInventorySlot& S) { return S.SlotID == NewSlot.SlotID; });
-		
-		const bool bIsNew = (OldSlot == nullptr); // Slot was empty before
-		const bool bQtyChanged = OldSlot && (OldSlot->Quantity != NewSlot.Quantity); // Quantity doesn't match
-		const bool bRowChanged = OldSlot && (OldSlot->ItemRowName != NewSlot.ItemRowName); // Name doesn't match
-		if (bIsNew || bQtyChanged || bRowChanged)
-			BroadcastInventorySlotPayload(NewSlot);
-	}
-	
-	for (const FInventorySlot& OldSlot : LastKnownInventory)
-	{
-		const bool bStillExists = Inventory.ContainsByPredicate(
-			[&](const FInventorySlot& S) { return S.SlotID == OldSlot.SlotID; });
- 
-		if (!bStillExists)
-		{
-			FInventoryDisplayPayload ClearPayload;
-			ClearPayload.VisualSlotIndex = OldSlot.VisualSlotIndex;
-			ClearPayload.Quantity        = 0;
-			OnSlotDisplayDirty.Broadcast(ClearPayload);
-		}
-	}
-	
-	LastKnownInventory = Inventory;
+	EquipmentSlots.MarkItemDirty(*EquipSlot);
 }
 
 FEquipmentSlot* ULittleInventoryManagerComponent::FindEquipmentSlot(EEquipmentSlot SlotType)
 {
 	const uint8 Index = (uint8)SlotType;
-	if (EquipmentSlots.IsValidIndex(Index))
-		return &EquipmentSlots[Index];
+	if (EquipmentSlots.Items.IsValidIndex(Index))
+		return &EquipmentSlots.Items[Index];
 	return nullptr;
 }
 
-void ULittleInventoryManagerComponent::BroadcastInventorySlotPayload(const FInventorySlot& InSlot) const
+void ULittleInventoryManagerComponent::NotifyInventorySlotChanged(const FInventorySlot& InSlot) const
 {
 	FInventoryDisplayPayload Payload;
 	Payload.VisualSlotIndex = InSlot.VisualSlotIndex;
@@ -219,13 +203,13 @@ void ULittleInventoryManagerComponent::BroadcastInventorySlotPayload(const FInve
 	if (const FItemDataRow* Row = ItemDataTable->FindRow<FItemDataRow>(InSlot.ItemRowName, ""))
 	{
 		Payload.ItemName = Row->ItemName;
-		Payload.ItemIcon = Row->ItemIcon.IsNull() ? nullptr : Row->ItemIcon.LoadSynchronous();	
+		Payload.ItemIcon = Row->ItemIcon;
 	}
 	
 	OnSlotDisplayDirty.Broadcast(Payload);
 }
 
-void ULittleInventoryManagerComponent::BroadcastEquipmentSlotPayload(const FEquipmentSlot& InSlot) const
+void ULittleInventoryManagerComponent::NotifyEquipmentSlotChanged(const FEquipmentSlot& InSlot) const
 {
 	FEquipmentDisplayPayload Payload;
 	Payload.SlotType = InSlot.SlotType;
@@ -234,17 +218,34 @@ void ULittleInventoryManagerComponent::BroadcastEquipmentSlotPayload(const FEqui
 	if (!ItemDataTable) return;
 	if (InSlot.ItemRowName.IsNone())
 	{
-	    OnEquipmentSlotDirty.Broadcast(Payload);
+		OnEquipmentSlotDirty.Broadcast(Payload);
 		return;
 	}
 	
 	if (const FItemDataRow* Row = ItemDataTable->FindRow<FItemDataRow>(InSlot.ItemRowName, ""))
 	{
 		Payload.ItemName = Row->ItemName;
-		Payload.ItemIcon = Row->ItemIcon.IsNull() ? nullptr : Row->ItemIcon.LoadSynchronous();
+		Payload.ItemIcon = Row->ItemIcon;
 	}
 	
 	OnEquipmentSlotDirty.Broadcast(Payload);
-
 }
 
+void ULittleInventoryManagerComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	Inventory.OwnerComponent = this;
+	EquipmentSlots.OwnerComponent = this;
+
+	if (GetOwner()->HasAuthority())
+	{
+		const uint8 SlotCount = static_cast<uint8>(EEquipmentSlot::Count);
+		for (uint8 i = 0; i < SlotCount; i++)
+		{
+			FEquipmentSlot& Slot = EquipmentSlots.Items.AddDefaulted_GetRef();
+			Slot = FEquipmentSlot(static_cast<EEquipmentSlot>(i));
+		}
+		EquipmentSlots.MarkArrayDirty();
+	}
+}

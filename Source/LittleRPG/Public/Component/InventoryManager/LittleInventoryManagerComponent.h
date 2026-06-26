@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Data/Inventory/FInventoryArray.h"
+#include "Data/Equipment/FEquipmentArray.h"
 #include "LittleInventoryManagerComponent.generated.h"
 
 struct FEquipmentDisplayPayload;
@@ -24,10 +26,11 @@ public:
 	// Inventory
 	void AddItemToInventory(const FName& ItemRowName, int32 Quantity);
 	void PrintInventory();
+	void NotifyInventorySlotChanged(const FInventorySlot& Slot) const;
 
 	FOnSlotDisplayDirty OnSlotDisplayDirty;
 
-	TArray<FInventorySlot>& GetInventory() {return Inventory;};
+	const FInventoryArray& GetInventory() {return Inventory;};
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -42,38 +45,34 @@ public:
 	FOnEquipmentSlotDirty OnEquipmentSlotDirty;
 	void EquipItemFromInventory(int32 VisualSlotIndex);
 	void UnequipItem(EEquipmentSlot SlotType);
+	void NotifyEquipmentSlotChanged(const FEquipmentSlot& Slot) const;
 	
 	UFUNCTION(Server, Reliable)
 	void Server_EquipItemFromInventory(int32 VisualSlotIndex);
 	
 	UFUNCTION(Server, Reliable)
 	void Server_UnequipItem(EEquipmentSlot SlotType);
-	const TArray<FEquipmentSlot>& GetEquipmentSlots() const { return EquipmentSlots; }
+
+	const FEquipmentArray& GetEquipmentSlots() const { return EquipmentSlots; }
+	
+protected:
+	virtual void BeginPlay() override;
+	
 private:
 	int32 NextSlotID  = 1;
 	int32 NextVisualIndex = 0;
 
 	// Inventory
-	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Inventory)
-	TArray<FInventorySlot> Inventory;
-	
-	TArray<FInventorySlot> LastKnownInventory;
+	UPROPERTY(VisibleAnywhere, Replicated)
+	FInventoryArray Inventory;
 	
 	// Equipment
-	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Equipment)
-	TArray<FEquipmentSlot> EquipmentSlots;
- 
-	TArray<FEquipmentSlot> LastKnownEquipment;
+	UPROPERTY(VisibleAnywhere, Replicated)
+	FEquipmentArray EquipmentSlots;
  
 	FEquipmentSlot* FindEquipmentSlot(EEquipmentSlot SlotType);
 	
 	// Data Table
 	UPROPERTY(EditDefaultsOnly, Category = "Data")
 	TObjectPtr<UDataTable> ItemDataTable;
-	void BroadcastInventorySlotPayload(const FInventorySlot& Slot) const;
-	void BroadcastEquipmentSlotPayload(const FEquipmentSlot& Slot) const;
-	
-	//Rep notifies
-	UFUNCTION() void OnRep_Equipment();
-	UFUNCTION() void OnRep_Inventory();
 };

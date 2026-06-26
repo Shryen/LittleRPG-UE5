@@ -2,7 +2,7 @@
 
 #include "Component/InventoryManager/LittleInventoryManagerComponent.h"
 #include "Components/UniformGridPanel.h"
-#include "Data/InventoryDisplayPayLoad.h"
+#include "Data/Inventory/InventoryDisplayPayLoad.h"
 #include "HUD/Widget/Inventory/InventoryItemWidget.h"
 
 

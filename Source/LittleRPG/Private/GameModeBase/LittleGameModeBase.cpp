@@ -3,7 +3,7 @@
 #include "Character/LittlePlayerCharacter.h"
 #include "Component/InventoryManager/LittleInventoryManagerComponent.h"
 #include "Controller/PlayerController/LittlePlayerController.h"
-#include "Data/FInventorySlot.h"
+#include "Data/Inventory/FInventorySlot.h"
 #include "Data/LittleSaveGame.h"
 #include "Kismet/GameplayStatics.h"
 #include "PlayerState/LittlePlayerState.h"
@@ -23,7 +23,7 @@ void ALittleGameModeBase::SaveGame() const
 	ULittleSaveGame* SaveData = Cast<ULittleSaveGame>(UGameplayStatics::CreateSaveGameObject(ULittleSaveGame::StaticClass()));
 	SaveData->SavedNextSlotID = LPS->GetInventoryManager()->GetNextSlotID();
 
-	for (const FInventorySlot& InventorySlot : LPS->GetInventoryManager()->GetInventory())
+	for (const FInventorySlot& InventorySlot : LPS->GetInventoryManager()->GetInventory().Items)
 	{
 		if (InventorySlot.ItemRowName.IsNone()) continue;
 

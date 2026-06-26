@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "EquipmentSlot.h"
+#include "Data/Equipment/EquipmentSlot.h"
 #include "GameplayTagContainer.h"
 #include "ItemDataRow.generated.h"
 

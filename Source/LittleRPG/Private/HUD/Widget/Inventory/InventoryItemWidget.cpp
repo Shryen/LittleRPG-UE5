@@ -3,7 +3,7 @@
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
 #include "Engine/DataTable.h"
-#include "Data/InventoryDisplayPayLoad.h"
+#include "Data/Inventory/InventoryDisplayPayLoad.h"
 
 void UInventoryItemWidget::UpdateFromPayload(const FInventoryDisplayPayload& Payload)
 {
@@ -19,7 +19,7 @@ void UInventoryItemWidget::UpdateFromPayload(const FInventoryDisplayPayload& Pay
 	if (!ItemQuantity) return;
 	
 	if (Payload.ItemIcon)
-		ItemIcon->SetBrushFromTexture(Payload.ItemIcon.LoadSynchronous());
+		ItemIcon->SetBrushFromSoftTexture(Payload.ItemIcon);
 	else
 		ItemIcon->SetBrushFromTexture(nullptr);
 	
