@@ -46,6 +46,9 @@ ULittleInventoryManagerComponent::ULittleInventoryManagerComponent()
 
 void ULittleInventoryManagerComponent::AddItemToInventory(const FName& ItemRowName, int32 Quantity)
 {
+	//Performance check for later if needed: combine first 2 loops into one by 
+	//maintaining a TArray<FInventorySlot*> of empty slots found during stacking checks
+	// for now should be fine
 	if (ItemRowName.IsNone() || !ItemDataTable || Quantity <= 0)
 		return;
 	if (!GetOwner()->HasAuthority())
@@ -56,24 +59,55 @@ void ULittleInventoryManagerComponent::AddItemToInventory(const FName& ItemRowNa
 
 	int32 Remaining = Quantity;
 	bool bArraySizeChanged = false;
+	FInventorySlot* FirstEmptySlot = nullptr;
 
 	for (FInventorySlot& Slot : Inventory.Items)
 	{
+		if (Slot.ItemRowName.IsNone())
+		{
+			if (!FirstEmptySlot) 
+			{
+				FirstEmptySlot = &Slot;
+			}
+			continue;
+		}
+		
 		if (Slot.ItemRowName != ItemRowName)
 			continue;
 		if (Slot.Quantity >= Row->MaxStack)
 			continue;
-
+		
 		const int32 Room  = Row->MaxStack - Slot.Quantity;
 		const int32 ToAdd = FMath::Min(Remaining, Room);
 		Slot.Quantity += ToAdd;
 		Remaining     -= ToAdd;
 		
 		Inventory.MarkItemDirty(Slot);
+		NotifyInventorySlotChanged(Slot);
 		
 		if (Remaining <= 0) return;
 	}
-
+	
+	if (Remaining > 0 && FirstEmptySlot)
+	{
+		// Look for the first empty slot we found!
+		for (int32 i = 0; i < Inventory.Items.Num() && Remaining > 0; ++i)
+		{
+			FInventorySlot& Slot = Inventory.Items[i];
+			if (Slot.ItemRowName.IsNone())
+			{
+				Slot.ItemRowName = ItemRowName;
+				Slot.Quantity = FMath::Min(Remaining, Row->MaxStack);
+				Slot.SlotID = NextSlotID++; // Maintain unique ID
+				// VisualSlotIndex stays the same since we're filling it up
+                
+				Remaining -= Slot.Quantity;
+				Inventory.MarkItemDirty(Slot);
+				NotifyInventorySlotChanged(Slot);
+			}
+		}
+	}
+	
 	while (Remaining > 0)
 	{
         FInventorySlot& NewSlot = Inventory.Items.AddDefaulted_GetRef();
@@ -82,16 +116,15 @@ void ULittleInventoryManagerComponent::AddItemToInventory(const FName& ItemRowNa
 		NewSlot.Quantity = FMath::Min(Remaining, Row->MaxStack);
 		NewSlot.VisualSlotIndex = NextVisualIndex++;
 		
-		// Inventory.Items.Add(NewSlot); AddDefaulted_GetRef adds the item to the inventory, don't add again
 		Remaining -= NewSlot.Quantity;
 		bArraySizeChanged = true;
+		Inventory.MarkItemDirty(NewSlot);
+		NotifyInventorySlotChanged(NewSlot);
 	}
 	
 	if (bArraySizeChanged)
-	{
-		// When elemetn been added or removed must mark the array
 		Inventory.MarkArrayDirty();
-	}
+	
 	
 	PrintInventory();
 }
@@ -160,9 +193,11 @@ void ULittleInventoryManagerComponent::EquipItemFromInventory(int32 VisualSlotIn
 		InvSlot->Quantity    = 0;
 	}
 	Inventory.MarkItemDirty(*InvSlot);
+	NotifyInventorySlotChanged(*InvSlot);
 	
 	EquipSlot->ItemRowName = ItemToEquip;
 	EquipmentSlots.MarkItemDirty(*EquipSlot);
+	NotifyEquipmentSlotChanged(*EquipSlot);
 }
 
 void ULittleInventoryManagerComponent::UnequipItem(EEquipmentSlot SlotType)
@@ -177,6 +212,7 @@ void ULittleInventoryManagerComponent::UnequipItem(EEquipmentSlot SlotType)
 	AddItemToInventory(EquipSlot->ItemRowName, 1);
 	EquipSlot->ItemRowName = NAME_None;
 	EquipmentSlots.MarkItemDirty(*EquipSlot);
+	NotifyEquipmentSlotChanged(*EquipSlot);
 }
 
 FEquipmentSlot* ULittleInventoryManagerComponent::FindEquipmentSlot(EEquipmentSlot SlotType)
