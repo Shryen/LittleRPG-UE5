@@ -36,6 +36,14 @@
 		{
 			"Name": "PCGWaterInterop",
 			"Enabled": true
+		},
+		{
+			"Name": "AssetReferenceRestrictions",
+			"Enabled": true
+		},
+		{
+			"Name": "AutomatedPerfTesting",
+			"Enabled": true
 		}
 	]
 }

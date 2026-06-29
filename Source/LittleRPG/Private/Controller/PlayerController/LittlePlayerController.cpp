@@ -80,12 +80,15 @@ void ALittlePlayerController::SetupInputComponent()
 		this,
 		&ALittlePlayerController::HandleInventory);
 	
-	EnhancedInput->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ALittlePlayerController::HandleInteract);
+	EnhancedInput->BindAction(InteractAction, ETriggerEvent::Started, this, &ALittlePlayerController::HandleInteract);
 }
 
 void ALittlePlayerController::Server_InteractAndSwap_Implementation(UInstancedStaticMeshComponent* Component,
 	int32 InstanceIndex)
 {
+	UE_LOG(LogTemp, Warning, TEXT("[Server_InteractAndSwap] Called. Component=%s InstanceIndex=%d HasAuthority=%d"),
+		Component ? *Component->GetFName().ToString() : TEXT("NULL"), InstanceIndex, HasAuthority());
+
 	if (!Component || !HasAuthority()) return;
 	if (!Component->IsValidInstance(InstanceIndex)) return;
 	
@@ -112,14 +115,16 @@ void ALittlePlayerController::Server_InteractAndSwap_Implementation(UInstancedSt
 	
 	FTransform InstanceTransform;
 	Component->GetInstanceTransform(InstanceIndex, InstanceTransform, true);
-	Component->RemoveInstance(InstanceIndex);
 	
-	AResourceNode* Node = GetWorld()->SpawnActorDeferred<AResourceNode>(
-	   SpawnClass, InstanceTransform, this);
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	
-	if (Node)
+
+	if (AResourceNode* Node = GetWorld()->SpawnActor<AResourceNode>(SpawnClass, InstanceTransform, SpawnParams))
 	{
-		Node->FinishSpawning(InstanceTransform);
+		UE_LOG(LogTemp, Warning, TEXT("[Server_InteractAndSwap] Spawned ResourceNode, calling SetDestroyedISMCInfo"));
+		Node->SetDestroyedISMCInfo(Component, InstanceIndex);
 		Node->Interact(GetPawn());
 	}
 }
@@ -176,14 +181,12 @@ void ALittlePlayerController::HandleInventory(const FInputActionValue& Value)
 
 void ALittlePlayerController::HandleInteract(const FInputActionValue& Value)
 {
-	ALittleHUD* LittleHUD = Cast<ALittleHUD>(GetHUD());
+	// ALittleHUD* LittleHUD = Cast<ALittleHUD>(GetHUD());
 	//if (LittleHUD->GetInventoryWidgetController()->IsOpen())
 	//	return;
 	FVector CameraLocation;
 	FRotator CameraRotation;
 	GetPlayerViewPoint(CameraLocation, CameraRotation);
-	
-	UE_LOG(LogTemp, Warning, TEXT("Got PlayerViewPoint"));
 	
 	FVector TraceEnd = CameraLocation + CameraRotation.Vector() * 500.f;
 
@@ -196,7 +199,7 @@ void ALittlePlayerController::HandleInteract(const FInputActionValue& Value)
 		ECC_Visibility, Params);
 	
 	DrawDebugLine(GetWorld(), CameraLocation, TraceEnd, bHit ? FColor::Green : FColor::Red, false, 2.f);
-
+	
 	if (!bHit) return;
 	
 	if (UInstancedStaticMeshComponent* ISMC = Cast<UInstancedStaticMeshComponent>(Hit.Component))
@@ -204,6 +207,8 @@ void ALittlePlayerController::HandleInteract(const FInputActionValue& Value)
 		for (const FName& TagName : ISMC->ComponentTags)
 		{
 			FGameplayTag Tag = FGameplayTag::RequestGameplayTag(TagName, false);
+			UE_LOG(LogTemp, Warning, TEXT("TagName: %s"), *TagName.ToString());
+			UE_LOG(LogTemp, Warning, TEXT("Tag: %s"), *Tag.ToString());
 			if (!Tag.IsValid()) continue;
 			if (Tag.IsValid() && ResourceNodeClassMap.Contains(Tag))
 			{
@@ -212,8 +217,6 @@ void ALittlePlayerController::HandleInteract(const FInputActionValue& Value)
 			}
 		}
 	}
-
-	
 	Server_Interact(Hit.GetActor());
 }
 
