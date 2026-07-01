@@ -9,7 +9,7 @@
 #include "Component/StatComponent/LittleStatComponent.h"
 #include "Components/InstancedStaticMeshComponent.h"
 #include "HUD/LittleHUD.h"
-#include "HUD/Widget/Inventory/InventoryWidgetController.h"
+#include "HUD/Widget/MainLayoutWidgetController.h"
 
 ALittlePlayerController::ALittlePlayerController()
 {
@@ -176,7 +176,8 @@ void ALittlePlayerController::HandleInventory(const FInputActionValue& Value)
 	if (!LittleHUD)
 		return;
 	
-	LittleHUD->GetInventoryWidgetController()->ToggleInventory();
+	if (UMainLayoutWidgetController* MainController = LittleHUD->GetMainLayoutWidgetController())
+		MainController->ToggleInventory();
 }
 
 void ALittlePlayerController::HandleInteract(const FInputActionValue& Value)

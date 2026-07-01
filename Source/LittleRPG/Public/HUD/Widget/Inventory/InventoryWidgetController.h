@@ -18,14 +18,11 @@ class LITTLERPG_API UInventoryWidgetController : public ULittleWidgetController
 	GENERATED_BODY()
 public:
 	virtual void SetWidget(ULittleUserWidget* InWidget) override;
-	UFUNCTION(BlueprintCallable)
-	void ToggleInventory();
 	
 	void BindDependencies();
 private:
 	UPROPERTY()
 	TObjectPtr<UInventoryWidget> InventoryWidget;
-	bool bIsOpen = false;
 	
 	UPROPERTY()
 	TObjectPtr<ALittlePlayerState> LittlePlayerState;
@@ -34,8 +31,4 @@ private:
 	void OnEquipmentSlotDirty(const FEquipmentDisplayPayload& Payload);
 	void OnInventoryItemRightClicked(int32 VisualSlotIndex);
 	void OnEquipmentSlotRightClicked(EEquipmentSlot SlotType);
-	
-	void ShowInventoryWidget();
-	void HideInventoryWidget();
-	
 };

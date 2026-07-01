@@ -3,6 +3,7 @@
 #include "Component/StatComponent/LittleStatComponent.h"
 #include "HUD/Widget/LittleWidgetController.h"
 #include "HUD/Widget/MainLayoutWidget.h"
+#include "HUD/Widget/MainLayoutWidgetController.h"
 #include "HUD/Widget/Inventory/InventoryWidget.h"
 #include "HUD/Widget/Inventory/InventoryWidgetController.h"
 #include "HUD/Widget/Stats/HealthBarWidgetController.h"
@@ -28,6 +29,13 @@ void ALittleHUD::SetupInventoryWidgetController(FWidgetControllerParams Params)
 	InventoryWidgetController = NewObject<UInventoryWidgetController>(this);
 	InventoryWidgetController->SetWidgetControllerParams(Params);
 	InventoryWidgetController->SetWidget(MainOverlayWidget->InventoryWidget);
+}
+
+void ALittleHUD::SetupMainLayoutWidgetController(FWidgetControllerParams Params)
+{
+	MainLayoutWidgetController = NewObject<UMainLayoutWidgetController>(this);
+	MainLayoutWidgetController->SetWidgetControllerParams(Params);
+	MainLayoutWidgetController->SetWidget(MainOverlayWidget);
 }
 
 void ALittleHUD::SetupHealthBarWidgetController(FWidgetControllerParams Params)
@@ -63,6 +71,7 @@ void ALittleHUD::BeginPlay()
 	
 	if (!SetupMainOverlayWidget(PC)) return;
 	
+	SetupMainLayoutWidgetController(Params);
 	SetupInventoryWidgetController(Params);
 	SetupHealthBarWidgetController(Params);
 	

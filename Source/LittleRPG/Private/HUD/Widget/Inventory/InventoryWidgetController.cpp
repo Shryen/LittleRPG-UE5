@@ -16,13 +16,7 @@ void UInventoryWidgetController::SetWidget(ULittleUserWidget* InWidget)
 		UE_LOG(LogTemp, Warning, TEXT("UInventoryWidgetController::SetWidget: Cast to UInventoryWidget failed!"));
 		return;
 	}
-	InventoryWidget->SetVisibility(ESlateVisibility::Collapsed);
 	LittlePlayerState = Cast<ALittlePlayerState>(PlayerState);
-}
-
-void UInventoryWidgetController::ToggleInventory()
-{
-	bIsOpen ? HideInventoryWidget() : ShowInventoryWidget();
 }
 
 void UInventoryWidgetController::BindDependencies()
@@ -79,33 +73,5 @@ void UInventoryWidgetController::OnEquipmentSlotRightClicked(EEquipmentSlot Slot
 	ULittleInventoryManagerComponent* Manager = LittlePlayerState->GetInventoryManager();
 	if (!Manager) return;
 	Manager->Server_UnequipItem(SlotType);
-}
-
-void UInventoryWidgetController::ShowInventoryWidget() 
-{
-	if (!InventoryWidget)
-		return;
-	
-	InventoryWidget->SetVisibility(ESlateVisibility::Visible);
-	bIsOpen = true;
-	FInputModeGameAndUI InputMode;
-	InputMode.SetWidgetToFocus(InventoryWidget->TakeWidget());
-	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-
-	PlayerController->SetInputMode(InputMode);
-	PlayerController->bShowMouseCursor = true;
-}
-
-void UInventoryWidgetController::HideInventoryWidget() 
-{
-	if (!InventoryWidget)
-		return;
-	
-	InventoryWidget->SetVisibility(ESlateVisibility::Collapsed);
-	bIsOpen = false;
-	
-	FInputModeGameOnly InputMode;
-	PlayerController->SetInputMode(InputMode);
-	PlayerController->bShowMouseCursor = false;
 }
 

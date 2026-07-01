@@ -8,6 +8,7 @@
 
 class UHealthBarWidgetController;
 class UMainLayoutWidget;
+class UMainLayoutWidgetController;
 class UInventoryWidgetController;
 class ULittleWidgetController;
 class ULittleUserWidget;
@@ -22,9 +23,11 @@ class LITTLERPG_API ALittleHUD : public AHUD
 public:
 	UInventoryWidgetController* GetInventoryWidgetController() const { return InventoryWidgetController; }
 	UHealthBarWidgetController* GetHealthBarWidgetController() const { return HealthBarWidgetController; }
+	UMainLayoutWidgetController* GetMainLayoutWidgetController() const { return MainLayoutWidgetController; }
 	
 protected:
 	bool SetupMainOverlayWidget(APlayerController* PC);
+	void SetupMainLayoutWidgetController(FWidgetControllerParams Params);
 	void SetupInventoryWidgetController(FWidgetControllerParams Params);
 	void SetupHealthBarWidgetController(FWidgetControllerParams Params);
 	void SetupPlayerStateDependencies();
@@ -35,6 +38,9 @@ protected:
 	TSubclassOf<ULittleUserWidget> MainOverlayWidgetClass;
 	
 private:
+	UPROPERTY()
+	TObjectPtr<UMainLayoutWidgetController> MainLayoutWidgetController;
+	
 	UPROPERTY()
 	TObjectPtr<UInventoryWidgetController> InventoryWidgetController;
 	
