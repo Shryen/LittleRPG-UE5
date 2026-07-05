@@ -30,6 +30,9 @@ protected:
 	
 	UFUNCTION(Server, Reliable)
 	void Server_InteractAndSwap(UInstancedStaticMeshComponent* Component, int32 InstanceIndex);
+
+	UFUNCTION(Exec)
+	void CheatAddItem(FName ItemRowName, int32 Quantity = 1);
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Interaction")
 	TMap<FGameplayTag, TSubclassOf<AResourceNode>> ResourceNodeClassMap;

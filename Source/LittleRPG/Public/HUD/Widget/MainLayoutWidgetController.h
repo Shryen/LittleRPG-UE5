@@ -30,7 +30,7 @@ private:
 	
 	UFUNCTION()
 	void SwitchToCrafting();
-	
+
 	UPROPERTY()
 	TObjectPtr<UMainLayoutWidget> MainLayoutWidget;
 	

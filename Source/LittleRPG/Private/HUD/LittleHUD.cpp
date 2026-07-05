@@ -4,6 +4,8 @@
 #include "HUD/Widget/LittleWidgetController.h"
 #include "HUD/Widget/MainLayoutWidget.h"
 #include "HUD/Widget/MainLayoutWidgetController.h"
+#include "HUD/Widget/Crafting/CraftingWidget.h"
+#include "HUD/Widget/Crafting/CraftingWidgetController.h"
 #include "HUD/Widget/Inventory/InventoryWidget.h"
 #include "HUD/Widget/Inventory/InventoryWidgetController.h"
 #include "HUD/Widget/Stats/HealthBarWidgetController.h"
@@ -45,6 +47,13 @@ void ALittleHUD::SetupHealthBarWidgetController(FWidgetControllerParams Params)
 	HealthBarWidgetController->SetWidget(MainOverlayWidget->HealthBarWidget);
 }
 
+void ALittleHUD::SetupCraftingWidgetController(FWidgetControllerParams Params)
+{
+	CraftingWidgetController = NewObject<UCraftingWidgetController>(this);
+	CraftingWidgetController->SetWidgetControllerParams(Params);
+	CraftingWidgetController->SetWidget(MainOverlayWidget->CraftingWidget);
+}
+
 void ALittleHUD::SetupPlayerStateDependencies()
 {
 	ALittleBaseCharacter* Character = Cast<ALittleBaseCharacter>(GetOwningPawn());
@@ -74,9 +83,11 @@ void ALittleHUD::BeginPlay()
 	SetupMainLayoutWidgetController(Params);
 	SetupInventoryWidgetController(Params);
 	SetupHealthBarWidgetController(Params);
+	SetupCraftingWidgetController(Params);
 	
 	MainOverlayWidget->InventoryWidget->SetWidgetController(InventoryWidgetController);
 	MainOverlayWidget->HealthBarWidget->SetWidgetController(HealthBarWidgetController);
+	MainOverlayWidget->CraftingWidget->SetWidgetController(CraftingWidgetController);
 	
 	SetupPlayerStateDependencies();
 }
@@ -87,4 +98,5 @@ void ALittleHUD::OnPlayerStateReady()
 	checkf(Character, TEXT("ALittleHUD::OnPlayerState: Character not found"));
 	HealthBarWidgetController->BindToStatComponent();
 	InventoryWidgetController->BindDependencies();
+	CraftingWidgetController->BindDependencies();
 }

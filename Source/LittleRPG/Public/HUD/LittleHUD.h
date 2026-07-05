@@ -6,6 +6,7 @@
 #include "LittleHUD.generated.h"
 
 
+class UCraftingWidgetController;
 class UHealthBarWidgetController;
 class UMainLayoutWidget;
 class UMainLayoutWidgetController;
@@ -24,12 +25,14 @@ public:
 	UInventoryWidgetController* GetInventoryWidgetController() const { return InventoryWidgetController; }
 	UHealthBarWidgetController* GetHealthBarWidgetController() const { return HealthBarWidgetController; }
 	UMainLayoutWidgetController* GetMainLayoutWidgetController() const { return MainLayoutWidgetController; }
+	UCraftingWidgetController* GetCraftingWidgetController() const { return CraftingWidgetController; }
 	
 protected:
 	bool SetupMainOverlayWidget(APlayerController* PC);
 	void SetupMainLayoutWidgetController(FWidgetControllerParams Params);
 	void SetupInventoryWidgetController(FWidgetControllerParams Params);
 	void SetupHealthBarWidgetController(FWidgetControllerParams Params);
+	void SetupCraftingWidgetController(FWidgetControllerParams Params);
 	void SetupPlayerStateDependencies();
 	virtual void BeginPlay() override;
 	void OnPlayerStateReady();
@@ -40,12 +43,12 @@ protected:
 private:
 	UPROPERTY()
 	TObjectPtr<UMainLayoutWidgetController> MainLayoutWidgetController;
-	
 	UPROPERTY()
 	TObjectPtr<UInventoryWidgetController> InventoryWidgetController;
-	
 	UPROPERTY()
 	TObjectPtr<UHealthBarWidgetController> HealthBarWidgetController;
+	UPROPERTY()
+	TObjectPtr<UCraftingWidgetController> CraftingWidgetController;
 	
 	UPROPERTY()
 	TObjectPtr<UMainLayoutWidget> MainOverlayWidget;

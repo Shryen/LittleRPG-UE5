@@ -10,6 +10,8 @@
 #include "Components/InstancedStaticMeshComponent.h"
 #include "HUD/LittleHUD.h"
 #include "HUD/Widget/MainLayoutWidgetController.h"
+#include "PlayerState/LittlePlayerState.h"
+#include "Component/InventoryManager/LittleInventoryManagerComponent.h"
 
 ALittlePlayerController::ALittlePlayerController()
 {
@@ -226,8 +228,17 @@ void ALittlePlayerController::TestDamage()
 		ALittlePlayerCharacter* CharacterPawn = Cast<ALittlePlayerCharacter>(GetPawn());
 		if (CharacterPawn)
 		{
-			CharacterPawn->GetStatComponent()->ServerTakeDamage(10);
-		}
+		CharacterPawn->GetStatComponent()->ServerTakeDamage(10);
+	}
 }
 
+void ALittlePlayerController::CheatAddItem(FName ItemRowName, int32 Quantity)
+{
+	if (!HasAuthority()) return;
+	ALittlePlayerState* PS = GetPlayerState<ALittlePlayerState>();
+	if (!PS) return;
+	ULittleInventoryManagerComponent* Inv = PS->GetInventoryManager();
+	if (!Inv) return;
+	Inv->AddItemToInventory(ItemRowName, Quantity);
+}
 

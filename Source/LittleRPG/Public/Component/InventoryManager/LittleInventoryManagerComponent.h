@@ -31,6 +31,7 @@ public:
 	FOnSlotDisplayDirty OnSlotDisplayDirty;
 
 	const FInventoryArray& GetInventory() const {return Inventory;};
+	FInventoryArray& GetInventory() {return Inventory;};
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 

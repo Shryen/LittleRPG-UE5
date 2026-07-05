@@ -2,27 +2,51 @@
 #include "HUD/Widget/Crafting/CraftingSlotWidget.h"
 #include "Components/UniformGridPanel.h"
 #include "Data/Crafting/CraftSlot.h"
+#include "Data/Crafting/IngredientData.h"
+#include "Data/Inventory/ItemDataRow.h"
 
 void UCraftingWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+	
+	PopulateSlots();
 }
 
-void UCraftingWidget::PopulateSlots(const TArray<FCraftSlot>& Slots)
+void UCraftingWidget::PopulateSlots()
 {
 	SlotWidgets.Empty();
 
-	if (!CraftingGrid || !CraftingSlotWidgetClass)
+	if (!CraftingGrid || !CraftingSlotWidgetClass || !CraftingData)
 		return;
 
-	for (int32 i = 0; i < Slots.Num(); i++)
+	TArray<FName> AllRecipes = CraftingData->GetRowNames();
+	
+	for (int i=0; i<AllRecipes.Num(); ++i)
 	{
+		FName CurrentRowName = AllRecipes[i];
+		
+		FIngredientRecipeData* RecipeData = CraftingData->FindRow<FIngredientRecipeData>(CurrentRowName, TEXT("Crafting Grid"));
+		
+		if (!RecipeData) return;
+		
+		FName ResultItem = RecipeData->ResultItemRowName;
+		FItemDataRow* ItemVisuals = InventoryDataTable->FindRow<FItemDataRow>(ResultItem, TEXT("Crafting Visuals"));
+		if (ItemVisuals == nullptr) return;
+		
 		UCraftingSlotWidget* SlotWidget = CreateWidget<UCraftingSlotWidget>(this, CraftingSlotWidgetClass);
-		if (SlotWidget)
+		SlotWidget->InitSlot(CurrentRowName);
+		SlotWidget->OnSlotClicked.AddLambda([this](FName ItemRowName)
 		{
-			SlotWidget->UpdateSlot(Slots[i]);
-			CraftingGrid->AddChildToUniformGrid(SlotWidget, i / ColumnCount, i % ColumnCount);
-			SlotWidgets.Add(SlotWidget);
-		}
+			OnCraftRequested.Broadcast(ItemRowName);
+		});
+		
+		FCraftSlot CraftSlot;
+		CraftSlot.Name = ItemVisuals->ItemName;
+		CraftSlot.Icon = ItemVisuals->ItemIcon;
+		SlotWidget->UpdateSlot(CraftSlot);
+		
+		int32 Row = i / ColumnCount;
+		int32 Column = i % ColumnCount;
+		CraftingGrid->AddChildToUniformGrid(SlotWidget, Row, Column);
 	}
 }

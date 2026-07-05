@@ -7,13 +7,17 @@
 class UCraftingSlotWidget;
 class UUniformGridPanel;
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FCraftRequested, FName)
+
 UCLASS()
 class LITTLERPG_API UCraftingWidget : public ULittleUserWidget
 {
 	GENERATED_BODY()
 
 public:
-	void PopulateSlots(const TArray<struct FCraftSlot>& Slots);
+	void PopulateSlots();
+	
+	FCraftRequested OnCraftRequested;
 
 protected:
 	virtual void NativeConstruct() override;
@@ -25,7 +29,13 @@ protected:
 	TSubclassOf<UCraftingSlotWidget> CraftingSlotWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "LittleRPG|Crafting")
-	int32 ColumnCount = 3;
+	int32 ColumnCount = 6;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "LittleRPG|Data")
+	TObjectPtr<UDataTable> CraftingData;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "LittleRPG|Data")
+	TObjectPtr<UDataTable> InventoryDataTable;
 
 private:
 	UPROPERTY()
