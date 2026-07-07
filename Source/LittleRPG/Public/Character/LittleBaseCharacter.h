@@ -4,6 +4,7 @@
 #include "GameFramework/Character.h"
 #include "LittleBaseCharacter.generated.h"
 
+class ULittleEquipManager;
 enum class EAttribute : uint8;
 class ULittleStatComponent;
 
@@ -38,4 +39,7 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<USceneComponent> LightMagicSceneComponent;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<ULittleEquipManager> EquipManager;
 };

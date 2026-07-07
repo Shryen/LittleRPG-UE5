@@ -15,4 +15,5 @@ struct FItemDataRow : public FTableRowBase
 	UPROPERTY(EditAnywhere) int32 MaxStack = 1;
 	UPROPERTY(EditAnywhere) TSubclassOf<AActor> ItemClass;
 	UPROPERTY(EditAnywhere) EEquipmentSlot EquipmentSlot = EEquipmentSlot::Empty;
+	UPROPERTY(EditAnywhere) FName AttachmentSocket;
 };

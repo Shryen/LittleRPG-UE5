@@ -21,6 +21,12 @@ AEquipment::AEquipment()
 	BoxCollision->SetGenerateOverlapEvents(true);
 }
 
+void AEquipment::TurnOffCollision()
+{
+	BoxCollision->SetGenerateOverlapEvents(false);
+	BoxCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
 void AEquipment::BeginPlay()
 {
 	Super::BeginPlay();

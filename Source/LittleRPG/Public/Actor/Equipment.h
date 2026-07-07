@@ -15,6 +15,8 @@ class LITTLERPG_API AEquipment : public APickupObject
 public:
 	AEquipment();
 	
+	void TurnOffCollision();
+	
 protected:
 	virtual void BeginPlay() override;
 	

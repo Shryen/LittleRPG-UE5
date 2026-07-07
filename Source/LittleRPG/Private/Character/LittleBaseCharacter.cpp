@@ -1,5 +1,6 @@
 ﻿#include "Character/LittleBaseCharacter.h"
 
+#include "Component/LittleEquipManager.h"
 #include "Component/StatComponent/LittleStatComponent.h"
 #include "Components/CapsuleComponent.h"
 
@@ -22,6 +23,8 @@ ALittleBaseCharacter::ALittleBaseCharacter()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
 	
 	GetCapsuleComponent()->SetGenerateOverlapEvents(true);
+	
+	EquipManager = CreateDefaultSubobject<ULittleEquipManager>(TEXT("EquipManagerComponent"));
 }
 
 void ALittleBaseCharacter::BeginPlay()
