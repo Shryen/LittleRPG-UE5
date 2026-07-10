@@ -5,17 +5,12 @@
 #include "InputActionValue.h"
 #include "Actor/Interactable/InteractableObject.h"
 #include "Actor/Resource/ResourceNode.h"
-#include "Character/LittlePlayerCharacter.h"
-#include "Component/StatComponent/LittleStatComponent.h"
 #include "Components/InstancedStaticMeshComponent.h"
 #include "HUD/LittleHUD.h"
 #include "HUD/Widget/MainLayoutWidgetController.h"
 #include "PlayerState/LittlePlayerState.h"
 #include "Component/InventoryManager/LittleInventoryManagerComponent.h"
-
-ALittlePlayerController::ALittlePlayerController()
-{
-}
+#include "GameFramework/Character.h"
 
 void ALittlePlayerController::BeginPlay()
 {
@@ -58,30 +53,11 @@ void ALittlePlayerController::SetupInputComponent()
 		return;
 	}
 
-	EnhancedInput->BindAction(
-		MoveAction,
-		ETriggerEvent::Triggered,
-		this,
-		&ALittlePlayerController::Move);
-
-	EnhancedInput->BindAction(
-		LookAction,
-		ETriggerEvent::Triggered,
-		this,
-		&ALittlePlayerController::Look);
-	
-	EnhancedInput->BindAction(
-	TakeDamageTest,
-	ETriggerEvent::Triggered,
-	this,
-	&ALittlePlayerController::TestDamage);
-	
-	EnhancedInput->BindAction(
-		InventoryAction,
-		ETriggerEvent::Triggered,
-		this,
-		&ALittlePlayerController::HandleInventory);
-	
+	EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ALittlePlayerController::Move);
+	EnhancedInput->BindAction(LookAction, ETriggerEvent::Triggered,this, &ALittlePlayerController::Look);
+	EnhancedInput->BindAction(JumpAction, ETriggerEvent::Started,this, &ALittlePlayerController::Jump);
+	EnhancedInput->BindAction(JumpAction, ETriggerEvent::Completed,this, &ALittlePlayerController::StopJump);
+	EnhancedInput->BindAction(InventoryAction, ETriggerEvent::Triggered,this, &ALittlePlayerController::HandleInventory);
 	EnhancedInput->BindAction(InteractAction, ETriggerEvent::Started, this, &ALittlePlayerController::HandleInteract);
 }
 
@@ -172,6 +148,22 @@ void ALittlePlayerController::Look(const FInputActionValue& Value)
 	AddPitchInput(-LookAxisVector.Y);
 }
 
+void ALittlePlayerController::Jump(const FInputActionValue& Value)
+{
+	if (ACharacter* ControlledCharacter = Cast<ACharacter>(GetPawn()))
+	{
+		ControlledCharacter->Jump();
+	}
+}
+
+void ALittlePlayerController::StopJump(const FInputActionValue& Value)
+{
+	if (ACharacter* ControlledCharacter = Cast<ACharacter>(GetPawn()))
+	{
+		ControlledCharacter->StopJumping();
+	}
+}
+
 void ALittlePlayerController::HandleInventory(const FInputActionValue& Value)
 {
 	ALittleHUD* LittleHUD = Cast<ALittleHUD>(GetHUD());
@@ -221,15 +213,6 @@ void ALittlePlayerController::HandleInteract(const FInputActionValue& Value)
 		}
 	}
 	Server_Interact(Hit.GetActor());
-}
-
-void ALittlePlayerController::TestDamage()
-{
-		ALittlePlayerCharacter* CharacterPawn = Cast<ALittlePlayerCharacter>(GetPawn());
-		if (CharacterPawn)
-		{
-		CharacterPawn->GetStatComponent()->ServerTakeDamage(10);
-	}
 }
 
 void ALittlePlayerController::CheatAddItem(FName ItemRowName, int32 Quantity)

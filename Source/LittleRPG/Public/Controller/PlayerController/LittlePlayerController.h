@@ -18,9 +18,6 @@ class LITTLERPG_API ALittlePlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
-public:
-	ALittlePlayerController();
-
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
@@ -40,11 +37,11 @@ protected:
 private:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	void Jump(const FInputActionValue& Value);
+	void StopJump(const FInputActionValue& Value);
 	void HandleInventory(const FInputActionValue& Value);
 	void HandleInteract(const FInputActionValue& Value);
 	
-	void TestDamage();
-
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UInputMappingContext> MovementMappingContext;
 
@@ -55,10 +52,10 @@ private:
 	TObjectPtr<UInputAction> LookAction;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	TObjectPtr<UInputAction> InventoryAction;
+	TObjectPtr<UInputAction> JumpAction;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Input")
-	TObjectPtr<UInputAction> TakeDamageTest;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> InventoryAction;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> InteractAction;

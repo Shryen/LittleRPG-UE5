@@ -4,6 +4,7 @@
 #include "UObject/Object.h"
 #include "LittleWidgetController.generated.h"
 
+class UAbilitySystemComponent;
 class ULittleUserWidget;
 class ULittleStatComponent;
 
@@ -13,15 +14,15 @@ struct FWidgetControllerParams
 	GENERATED_BODY()
 	
 	FWidgetControllerParams(){};
-	FWidgetControllerParams(APlayerController* PC, APlayerState* PS, ULittleStatComponent* LSC)
-		: PlayerController(PC), PlayerState(PS), StatComponent(LSC){};
+	FWidgetControllerParams(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC)
+		: PlayerController(PC), PlayerState(PS), AbilitySystemComponent(ASC){};
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<APlayerController> PlayerController = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<APlayerState> PlayerState = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<ULittleStatComponent> StatComponent = nullptr;
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent = nullptr;
 };
 /**
  * 
@@ -44,7 +45,7 @@ protected:
 	TObjectPtr<APlayerState> PlayerState;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "LittleRPG|Widget|Controller")
-	TObjectPtr<ULittleStatComponent> StatComponent;
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<ULittleUserWidget> OwnerWidget;

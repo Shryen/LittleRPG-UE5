@@ -6,7 +6,7 @@ void ULittleWidgetController::SetWidgetControllerParams(const FWidgetControllerP
 {
 	PlayerController = Params.PlayerController;
 	PlayerState = Params.PlayerState;
-	StatComponent = Params.StatComponent;
+	AbilitySystemComponent = Params.AbilitySystemComponent;
 }
 
 void ULittleWidgetController::SetWidget(ULittleUserWidget* InWidget)

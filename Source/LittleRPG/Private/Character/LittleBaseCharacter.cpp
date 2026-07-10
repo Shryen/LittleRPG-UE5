@@ -1,7 +1,7 @@
 ﻿#include "Character/LittleBaseCharacter.h"
 
+#include "AbilitySystemComponent.h"
 #include "Component/LittleEquipManager.h"
-#include "Component/StatComponent/LittleStatComponent.h"
 #include "Components/CapsuleComponent.h"
 
 ALittleBaseCharacter::ALittleBaseCharacter()
@@ -9,7 +9,6 @@ ALittleBaseCharacter::ALittleBaseCharacter()
 	bReplicates = true;
 	SetReplicateMovement(true);
 	
-	LittleStatComponent = CreateDefaultSubobject<ULittleStatComponent>(TEXT("LittleStatComponent"));
 	LightMagicSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("LightMagicSceneComponent"));
 	LightMagicSceneComponent->SetupAttachment(GetRootComponent());
 	
@@ -25,45 +24,54 @@ ALittleBaseCharacter::ALittleBaseCharacter()
 	GetCapsuleComponent()->SetGenerateOverlapEvents(true);
 	
 	EquipManager = CreateDefaultSubobject<ULittleEquipManager>(TEXT("EquipManagerComponent"));
+	//AbilitySystem
+	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(AscReplicationMode);
+	
+}
+
+UAbilitySystemComponent* ALittleBaseCharacter::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
 }
 
 void ALittleBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	LittleStatComponent->OnStatChanged.AddDynamic(this, &ALittleBaseCharacter::HandleStatChanged);
+	
+	checkf(AbilitySystemComponent, TEXT("AbilitySystemComponent is not valid."));
+	
+	if (!HasAuthority())
+		return;
+	
+
+	if (!GivenAbilities.IsEmpty())
+	    for (const TSubclassOf<UGameplayAbility>& AbilityClass : GivenAbilities)
+		{
+			FGameplayAbilitySpec AbilitySpec(AbilityClass, 1);
+			AbilitySystemComponent->GiveAbility(AbilitySpec);
+		}
 }
 
 void ALittleBaseCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
+	checkf(AbilitySystemComponent, TEXT("AbilitySystemComponent is not valid."));
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	
 	OnPlayerStateReady.Broadcast();
 }
 
 void ALittleBaseCharacter::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
+	checkf(AbilitySystemComponent, TEXT("AbilitySystemComponent is not valid."));
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	
 	OnPlayerStateReady.Broadcast();
 }
 
-void ALittleBaseCharacter::HandleStatChanged(EAttribute StatType, float NewStat)
-{
-	if (IsLocallyControlled())
-	{
-		FString healthMessage = FString::Printf(TEXT("You now have %f health remaining."), NewStat);
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, healthMessage);
-		
-		if (NewStat <= 0)
-		{
-			FString deathMessage = FString::Printf(TEXT("You have been killed."));
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, deathMessage);
-		}
-	}
-	
-    if (GetLocalRole() == ROLE_Authority)	{
-		FString healthMessage = FString::Printf(TEXT("%s now has %f health remaining."), *GetFName().ToString(), NewStat);
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, healthMessage);
-	}
-}
 
 void ALittleBaseCharacter::Tick(float DeltaTime)
 {

@@ -12,3 +12,8 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Equipment_Light)
 // Equip functionality
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Equipment_Equipped)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Equipment_UnEquipped)
+
+
+// Abilities
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Ability_Movement_Dash)
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_GameplayCue_Movement_Dash)

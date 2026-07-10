@@ -44,6 +44,10 @@
 		{
 			"Name": "AutomatedPerfTesting",
 			"Enabled": true
+		},
+		{
+			"Name": "GameplayAbilities",
+			"Enabled": true
 		}
 	]
 }

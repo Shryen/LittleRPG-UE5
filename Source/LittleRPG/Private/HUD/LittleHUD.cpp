@@ -1,6 +1,5 @@
 ﻿#include "HUD/LittleHUD.h"
 #include "Character/LittleBaseCharacter.h"
-#include "Component/StatComponent/LittleStatComponent.h"
 #include "HUD/Widget/LittleWidgetController.h"
 #include "HUD/Widget/MainLayoutWidget.h"
 #include "HUD/Widget/MainLayoutWidgetController.h"
@@ -72,11 +71,11 @@ void ALittleHUD::BeginPlay()
 	Super::BeginPlay();
 	APlayerController* PC = GetOwningPlayerController();
 	ALittlePlayerState* PS = PC->GetPlayerState<ALittlePlayerState>();
-	ULittleStatComponent* LSC = nullptr;
+	UAbilitySystemComponent* ASC = nullptr;
 	if (ALittleBaseCharacter* Character = Cast<ALittleBaseCharacter>(GetOwningPawn()))
-		LSC = Character->GetStatComponent();
+		ASC = Character->GetAbilitySystemComponent();
 
-	FWidgetControllerParams Params(PC,PS,LSC);
+	FWidgetControllerParams Params(PC,PS,ASC);
 	
 	if (!SetupMainOverlayWidget(PC)) return;
 	

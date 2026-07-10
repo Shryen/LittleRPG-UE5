@@ -22,9 +22,6 @@ public:
 	
 	void BindToStatComponent();
 	
-	UFUNCTION()
-	void OnHealthChanged(EAttribute StatType,float NewValue);
-	
 private:
 	UPROPERTY()
 	TObjectPtr<UHealthWidget> HealthWidget;
