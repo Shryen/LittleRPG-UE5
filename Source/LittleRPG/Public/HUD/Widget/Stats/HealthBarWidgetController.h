@@ -4,11 +4,9 @@
 #include "HUD/Widget/LittleWidgetController.h"
 #include "HealthBarWidgetController.generated.h"
 
-enum class EAttribute : uint8;
 class UHealthWidget;
-/**
- * 
- */
+struct FOnAttributeChangeData;
+
 UCLASS()
 class LITTLERPG_API UHealthBarWidgetController : public ULittleWidgetController
 {
@@ -20,9 +18,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void UpdateHealthBar(float CurrentHealth, float MaxHealth);
 	
-	void BindToStatComponent();
+	void BindToHealthAttribute();
 	
 private:
 	UPROPERTY()
 	TObjectPtr<UHealthWidget> HealthWidget;
+
+	void OnHealthChanged(const FOnAttributeChangeData& Data);
+
+	void OnMaxHealthChanged(const FOnAttributeChangeData& Data);
 };

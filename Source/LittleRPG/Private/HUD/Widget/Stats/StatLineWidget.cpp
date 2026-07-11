@@ -1,7 +1,7 @@
 #include "HUD/Widget/Stats/StatLineWidget.h"
 #include "Components/TextBlock.h"
 
-void UStatLineWidget::SetValues(const FName& AttributeName, int32 Value)
+void UStatLineWidget::SetValues(const FName& AttributeName, float Value)
 {
 	if (Attribute)
 		Attribute->SetText(FText::FromName(AttributeName));

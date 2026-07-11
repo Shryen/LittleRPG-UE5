@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "LittleBaseCharacter.generated.h"
 
+class ULittleAttributeSet;
 enum class EGameplayEffectReplicationMode;
 class ULittleEquipManager;
 
@@ -29,10 +30,26 @@ public:
 	virtual void BeginPlay() override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
+
+	void OnHealthChanged(const FOnAttributeChangeData& Data);
+	void BindDependencies();
+	void OnStaminaChanged(const FOnAttributeChangeData& Data);
+	
+	void InitDefaultGameplayEffects();
+	
+	ULittleAttributeSet* GetLittleAttributeSet() { return LittleAttributeSet; };
+	
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UGameplayEffect> GE_StaminaRegen;
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UGameplayEffect> GE_HealthRegen;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="AbilitySystem")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AbilitySystem")
+	TObjectPtr<ULittleAttributeSet> LittleAttributeSet;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AbilitySystem")
 	EGameplayEffectReplicationMode AscReplicationMode = EGameplayEffectReplicationMode::Mixed;
@@ -46,4 +63,10 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "AbilitySystem")
 	TArray<TSubclassOf<UGameplayAbility>> GivenAbilities;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "AbilitySystem")
+	TSubclassOf<UGameplayEffect> InitialGameplayEffects;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "AbilitySystem")
+	TSubclassOf<UGameplayEffect> InitialSecondaryGameplayEffects;
 };

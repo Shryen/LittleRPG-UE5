@@ -12,7 +12,7 @@ class LITTLERPG_API UStatLineWidget : public ULittleUserWidget
 	GENERATED_BODY()
 
 public:
-	void SetValues(const FName& AttributeName, int32 Value);
+	void SetValues(const FName& AttributeName, float Value);
 
 private:
 	UPROPERTY(meta = (BindWidget))

@@ -1,4 +1,6 @@
 ﻿#include "HUD/LittleHUD.h"
+
+#include "AbilitySystem/AttributeSet/LittleAttributeSet.h"
 #include "Character/LittleBaseCharacter.h"
 #include "HUD/Widget/LittleWidgetController.h"
 #include "HUD/Widget/MainLayoutWidget.h"
@@ -72,10 +74,11 @@ void ALittleHUD::BeginPlay()
 	APlayerController* PC = GetOwningPlayerController();
 	ALittlePlayerState* PS = PC->GetPlayerState<ALittlePlayerState>();
 	UAbilitySystemComponent* ASC = nullptr;
-	if (ALittleBaseCharacter* Character = Cast<ALittleBaseCharacter>(GetOwningPawn()))
-		ASC = Character->GetAbilitySystemComponent();
+	ALittleBaseCharacter* Character = Cast<ALittleBaseCharacter>(GetOwningPawn());
+	ASC = Character->GetAbilitySystemComponent();
+	ULittleAttributeSet* AS = Character->GetLittleAttributeSet();
 
-	FWidgetControllerParams Params(PC,PS,ASC);
+	const FWidgetControllerParams Params(PC,PS,ASC,AS);
 	
 	if (!SetupMainOverlayWidget(PC)) return;
 	
@@ -95,7 +98,8 @@ void ALittleHUD::OnPlayerStateReady()
 {
 	ALittleBaseCharacter* Character = Cast<ALittleBaseCharacter>(GetOwningPawn());
 	checkf(Character, TEXT("ALittleHUD::OnPlayerState: Character not found"));
-	HealthBarWidgetController->BindToStatComponent();
+	HealthBarWidgetController->BindToHealthAttribute();
 	InventoryWidgetController->BindDependencies();
+	InventoryWidgetController->BindStatAttributes();
 	CraftingWidgetController->BindDependencies();
 }

@@ -12,5 +12,13 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_Equipment_UnEquipped, "Equipment.UnEquipped")
 
 // Ability
 UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_Movement_Dash, "Ability.Movement.Dash")
+
+// GameplayCue
 UE_DEFINE_GAMEPLAY_TAG(TAG_GameplayCue_Movement_Dash, "GameplayCue.Movement.Dash")
 
+// Cooldown
+UE_DEFINE_GAMEPLAY_TAG(TAG_Cooldown_Dash, "Cooldown.Dash");
+
+// Regen
+UE_DEFINE_GAMEPLAY_TAG(TAG_Regen_Stamina, "Regen.Stamina")
+UE_DEFINE_GAMEPLAY_TAG(TAG_Regen_Health, "Regen.Health")
