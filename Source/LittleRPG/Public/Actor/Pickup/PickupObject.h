@@ -2,7 +2,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Interactable/InteractableObject.h"
+#include "Actor/Interactable/InteractableObject.h"
 #include "PickupObject.generated.h"
 
 class USphereComponent;

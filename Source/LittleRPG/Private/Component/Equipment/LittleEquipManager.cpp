@@ -1,6 +1,7 @@
-﻿#include "Component/LittleEquipManager.h"
+﻿#include "Component/Equipment/LittleEquipManager.h"
 
-#include "Actor/Equipment.h"
+#include "Actor/Equipment/Equipment.h"
+#include "Actor/Equipment/Weapon/LittleWeaponBase.h"
 #include "Character/LittleBaseCharacter.h"
 #include "Component/InventoryManager/LittleInventoryManagerComponent.h"
 #include "Data/Inventory/ItemDataRow.h"
@@ -85,10 +86,27 @@ void ULittleEquipManager::BeginPlay()
 void ULittleEquipManager::OnEquipmentChanged(const FEquipmentDisplayPayload& Payload)
 {
 	DestroyEquippedActor(Payload.SlotType);
-    
+	
+	ALittleBaseCharacter* BaseCharacter = Cast<ALittleBaseCharacter>(GetOwner());
+	if (!BaseCharacter || !BaseCharacter->GetMesh()) return;
+	
+	if (Payload.ItemRowName.IsNone())
+	{
+		if (Payload.SlotType == EEquipmentSlot::Weapon && UnarmedAnimClass)
+			BaseCharacter->GetMesh()->SetAnimInstanceClass(UnarmedAnimClass);
+		return; 
+	}
+	
 	if (!Payload.ItemRowName.IsNone())
 		if (AActor* NewActor = SpawnEquippedActor(Payload.SlotType, Payload.ItemRowName))
+		{
 			SpawnedEquipment.Add(Payload.SlotType, NewActor);
+			
+			if (Payload.SlotType == EEquipmentSlot::Weapon)
+				if (ALittleWeaponBase* Weapon = Cast<ALittleWeaponBase>(NewActor))
+					if (Weapon->WeaponAnimClass)
+						BaseCharacter->GetMesh()->SetAnimInstanceClass(Weapon->WeaponAnimClass);
+		}
 }
 
 void ULittleEquipManager::OnPlayerStateReady()

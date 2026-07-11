@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
+#include "Data/CharacterState/ECharacterState.h"
 #include "GameFramework/Character.h"
 #include "LittleBaseCharacter.generated.h"
 
@@ -30,6 +31,11 @@ public:
 	virtual void BeginPlay() override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
+	
+	UFUNCTION()
+	void OnRep_CharacterState();
+	
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 	void OnHealthChanged(const FOnAttributeChangeData& Data);
 	void BindDependencies();
@@ -43,6 +49,9 @@ public:
 	TSubclassOf<UGameplayEffect> GE_StaminaRegen;
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UGameplayEffect> GE_HealthRegen;
+	
+	void SetCharacterState(const ECharacterState NewState);
+	ECharacterState GetCharacterState() const { return CharacterState; };
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="AbilitySystem")
@@ -69,4 +78,7 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "AbilitySystem")
 	TSubclassOf<UGameplayEffect> InitialSecondaryGameplayEffects;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Little|State", ReplicatedUsing="OnRep_CharacterState")
+	ECharacterState CharacterState = ECharacterState::Unarmed;
 };

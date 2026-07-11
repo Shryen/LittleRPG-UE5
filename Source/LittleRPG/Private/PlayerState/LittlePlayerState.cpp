@@ -1,6 +1,6 @@
 ﻿#include "PlayerState/LittlePlayerState.h"
 
-#include "Component/LittleCraftManagerComponent.h"
+#include "Component/Crafting/LittleCraftManagerComponent.h"
 #include "Component/InventoryManager/LittleInventoryManagerComponent.h"
 
 ALittlePlayerState::ALittlePlayerState()

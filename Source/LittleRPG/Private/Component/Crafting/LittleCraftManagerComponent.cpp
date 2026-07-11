@@ -1,4 +1,4 @@
-﻿#include "Component/LittleCraftManagerComponent.h"
+﻿#include "Component/Crafting/LittleCraftManagerComponent.h"
 #include "Component/InventoryManager/LittleInventoryManagerComponent.h"
 #include "Data/Crafting/IngredientData.h"
 #include "PlayerState/LittlePlayerState.h"

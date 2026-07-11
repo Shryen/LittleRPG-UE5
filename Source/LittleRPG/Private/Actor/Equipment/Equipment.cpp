@@ -1,4 +1,4 @@
-﻿#include "Actor/Equipment.h"
+﻿#include "Actor/Equipment/Equipment.h"
 
 #include "Character/LittlePlayerCharacter.h"
 #include "Component/InventoryManager/LittleInventoryManagerComponent.h"

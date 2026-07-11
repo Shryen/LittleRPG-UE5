@@ -1,10 +1,11 @@
 ﻿#include "Character/LittleBaseCharacter.h"
 
 #include "AbilitySystemComponent.h"
-#include "LittleGameplayTags.h"
+#include "AbilitySystem/GameplayTags/LittleGameplayTags.h"
 #include "AbilitySystem/AttributeSet/LittleAttributeSet.h"
-#include "Component/LittleEquipManager.h"
+#include "Component/Equipment/LittleEquipManager.h"
 #include "Components/CapsuleComponent.h"
+#include "Net/UnrealNetwork.h"
 
 ALittleBaseCharacter::ALittleBaseCharacter()
 {
@@ -78,6 +79,17 @@ void ALittleBaseCharacter::OnRep_PlayerState()
 	OnPlayerStateReady.Broadcast();
 }
 
+void ALittleBaseCharacter::OnRep_CharacterState()
+{
+	
+}
+
+void ALittleBaseCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ALittleBaseCharacter, CharacterState);
+}
+
 void ALittleBaseCharacter::OnHealthChanged(const FOnAttributeChangeData& Data)
 {
 	if (!HasAuthority()) return; 
@@ -111,7 +123,7 @@ void ALittleBaseCharacter::BindDependencies()
 
 void ALittleBaseCharacter::OnStaminaChanged(const FOnAttributeChangeData& Data)
 {
-	if (!HasAuthority()) return; 
+	if (!HasAuthority()) return;
 
 	if (Data.NewValue < Data.OldValue)
 	{
@@ -161,6 +173,11 @@ void ALittleBaseCharacter::InitDefaultGameplayEffects()
 		AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SecondarySpecHandle.Data.Get());
 	}
 	
+}
+
+void ALittleBaseCharacter::SetCharacterState(const ECharacterState NewState)
+{
+	CharacterState = NewState;
 }
 
 void ALittleBaseCharacter::Tick(float DeltaTime)

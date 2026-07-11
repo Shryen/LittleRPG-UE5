@@ -1,5 +1,5 @@
 ﻿#include "HUD/Widget/Crafting/CraftingWidgetController.h"
-#include "Component/LittleCraftManagerComponent.h"
+#include "Component/Crafting/LittleCraftManagerComponent.h"
 #include "HUD/Widget/Crafting/CraftingWidget.h"
 #include "PlayerState/LittlePlayerState.h"
 

@@ -5,10 +5,11 @@
 #include "LittleUserWidget.h"
 #include "MainLayoutWidget.generated.h"
 
+class UVitalBars;
+class UBaseProgressBar;
 class UButton;
 class UOverlay;
 class UWidgetSwitcher;
-class UHealthWidget;
 class UInventoryWidget;
 class UCraftingWidget;
 
@@ -35,7 +36,7 @@ public:
 	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UCraftingWidget> CraftingWidget;
-	
+
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UHealthWidget> HealthBarWidget;
+	TObjectPtr<UVitalBars> VitalBarsWidget;
 };

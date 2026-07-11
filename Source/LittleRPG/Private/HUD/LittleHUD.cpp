@@ -9,8 +9,9 @@
 #include "HUD/Widget/Crafting/CraftingWidgetController.h"
 #include "HUD/Widget/Inventory/InventoryWidget.h"
 #include "HUD/Widget/Inventory/InventoryWidgetController.h"
-#include "HUD/Widget/Stats/HealthBarWidgetController.h"
-#include "HUD/Widget/Stats/HealthWidget.h"
+#include "HUD/Widget/Stats/BaseProgressBar.h"
+#include "HUD/Widget/Stats/ProgressBarWidgetController.h"
+#include "HUD/Widget/Stats/UserBars/VitalBars.h"
 #include "PlayerState/LittlePlayerState.h"
 
 bool ALittleHUD::SetupMainOverlayWidget(APlayerController* PC)
@@ -43,9 +44,20 @@ void ALittleHUD::SetupMainLayoutWidgetController(FWidgetControllerParams Params)
 
 void ALittleHUD::SetupHealthBarWidgetController(FWidgetControllerParams Params)
 {
-	HealthBarWidgetController = NewObject<UHealthBarWidgetController>(this);
+	HealthBarWidgetController = NewObject<UProgressBarWidgetController>(this);
 	HealthBarWidgetController->SetWidgetControllerParams(Params);
-	HealthBarWidgetController->SetWidget(MainOverlayWidget->HealthBarWidget);
+	HealthBarWidgetController->CurrentAttribute = ULittleAttributeSet::GetHealthAttribute();
+	HealthBarWidgetController->MaxAttribute = ULittleAttributeSet::GetMaxHealthAttribute();
+	HealthBarWidgetController->SetWidget(MainOverlayWidget->VitalBarsWidget->HealthBarWidget);
+}
+
+void ALittleHUD::SetupStaminaBarWidgetController(FWidgetControllerParams Params)
+{
+	StaminaBarWidgetController = NewObject<UProgressBarWidgetController>(this);
+	StaminaBarWidgetController->SetWidgetControllerParams(Params);
+	StaminaBarWidgetController->CurrentAttribute = ULittleAttributeSet::GetStaminaAttribute();
+	StaminaBarWidgetController->MaxAttribute = ULittleAttributeSet::GetMaxStaminaAttribute();
+	StaminaBarWidgetController->SetWidget(MainOverlayWidget->VitalBarsWidget->StaminaBarWidget);
 }
 
 void ALittleHUD::SetupCraftingWidgetController(FWidgetControllerParams Params)
@@ -85,10 +97,12 @@ void ALittleHUD::BeginPlay()
 	SetupMainLayoutWidgetController(Params);
 	SetupInventoryWidgetController(Params);
 	SetupHealthBarWidgetController(Params);
+	SetupStaminaBarWidgetController(Params);
 	SetupCraftingWidgetController(Params);
 	
 	MainOverlayWidget->InventoryWidget->SetWidgetController(InventoryWidgetController);
-	MainOverlayWidget->HealthBarWidget->SetWidgetController(HealthBarWidgetController);
+	MainOverlayWidget->VitalBarsWidget->HealthBarWidget->SetWidgetController(HealthBarWidgetController);
+	MainOverlayWidget->VitalBarsWidget->StaminaBarWidget->SetWidgetController(StaminaBarWidgetController);
 	MainOverlayWidget->CraftingWidget->SetWidgetController(CraftingWidgetController);
 	
 	SetupPlayerStateDependencies();
@@ -98,8 +112,10 @@ void ALittleHUD::OnPlayerStateReady()
 {
 	ALittleBaseCharacter* Character = Cast<ALittleBaseCharacter>(GetOwningPawn());
 	checkf(Character, TEXT("ALittleHUD::OnPlayerState: Character not found"));
-	HealthBarWidgetController->BindToHealthAttribute();
+	HealthBarWidgetController->BindToAttribute();
+	StaminaBarWidgetController->BindToAttribute();
 	InventoryWidgetController->BindDependencies();
 	InventoryWidgetController->BindStatAttributes();
 	CraftingWidgetController->BindDependencies();
+	
 }

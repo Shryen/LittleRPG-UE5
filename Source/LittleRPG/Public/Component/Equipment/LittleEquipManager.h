@@ -42,4 +42,7 @@ private:
 	UPROPERTY()
 	TObjectPtr<ULittleInventoryManagerComponent> InventoryManager;
 	
+	UPROPERTY(EditDefaultsOnly, Category = "Little|Animation")
+	TSubclassOf<UAnimInstance> UnarmedAnimClass;
+	
 };

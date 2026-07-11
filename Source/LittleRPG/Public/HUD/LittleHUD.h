@@ -7,13 +7,12 @@
 
 
 class UCraftingWidgetController;
-class UHealthBarWidgetController;
+class UProgressBarWidgetController;
 class UMainLayoutWidget;
 class UMainLayoutWidgetController;
 class UInventoryWidgetController;
 class ULittleWidgetController;
 class ULittleUserWidget;
-class UHealthWidget;
 class UInventoryWidget;
 
 UCLASS()
@@ -23,7 +22,8 @@ class LITTLERPG_API ALittleHUD : public AHUD
 
 public:
 	UInventoryWidgetController* GetInventoryWidgetController() const { return InventoryWidgetController; }
-	UHealthBarWidgetController* GetHealthBarWidgetController() const { return HealthBarWidgetController; }
+	UProgressBarWidgetController* GetHealthBarWidgetController() const { return HealthBarWidgetController; }
+	UProgressBarWidgetController* GetStaminaBarWidgetController() const { return StaminaBarWidgetController; }
 	UMainLayoutWidgetController* GetMainLayoutWidgetController() const { return MainLayoutWidgetController; }
 	UCraftingWidgetController* GetCraftingWidgetController() const { return CraftingWidgetController; }
 	
@@ -32,6 +32,7 @@ protected:
 	void SetupMainLayoutWidgetController(FWidgetControllerParams Params);
 	void SetupInventoryWidgetController(FWidgetControllerParams Params);
 	void SetupHealthBarWidgetController(FWidgetControllerParams Params);
+	void SetupStaminaBarWidgetController(FWidgetControllerParams Params);
 	void SetupCraftingWidgetController(FWidgetControllerParams Params);
 	void SetupPlayerStateDependencies();
 	virtual void BeginPlay() override;
@@ -39,14 +40,16 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 	TSubclassOf<ULittleUserWidget> MainOverlayWidgetClass;
-	
+
 private:
 	UPROPERTY()
 	TObjectPtr<UMainLayoutWidgetController> MainLayoutWidgetController;
 	UPROPERTY()
 	TObjectPtr<UInventoryWidgetController> InventoryWidgetController;
 	UPROPERTY()
-	TObjectPtr<UHealthBarWidgetController> HealthBarWidgetController;
+	TObjectPtr<UProgressBarWidgetController> HealthBarWidgetController;
+	UPROPERTY()
+	TObjectPtr<UProgressBarWidgetController> StaminaBarWidgetController;
 	UPROPERTY()
 	TObjectPtr<UCraftingWidgetController> CraftingWidgetController;
 	

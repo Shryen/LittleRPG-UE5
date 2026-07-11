@@ -1,5 +1,6 @@
 ﻿#include "AbilitySystem/AttributeSet/LittleAttributeSet.h"
 
+#include "GameplayEffectExtension.h"
 #include "Net/UnrealNetwork.h"
 
 ULittleAttributeSet::ULittleAttributeSet()
@@ -13,6 +14,31 @@ ULittleAttributeSet::ULittleAttributeSet()
 	Strength = 8.f;
 	Intellect = 3.f;
 	Agility = 4.f;
+}
+
+void ULittleAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
+{
+	Super::PreAttributeChange(Attribute, NewValue);
+	if (Attribute == GetHealthAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxHealth());
+	} else if (Attribute == GetStaminaAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxStamina());
+	}
+}
+
+void ULittleAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)
+{
+	Super::PostGameplayEffectExecute(Data);
+	// looks weird but this is going to trigger PreAttributeChange where clamping happens
+	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+	{
+		SetHealth(GetHealth());
+	} else if (Data.EvaluatedData.Attribute == GetStaminaAttribute())
+	{
+		SetStamina(GetStamina());
+	}
 }
 
 void ULittleAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const

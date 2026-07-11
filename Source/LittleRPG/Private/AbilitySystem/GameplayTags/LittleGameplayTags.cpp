@@ -1,4 +1,4 @@
-﻿#include "LittleGameplayTags.h"
+﻿#include "AbilitySystem/GameplayTags/LittleGameplayTags.h"
 
 // Resources
 UE_DEFINE_GAMEPLAY_TAG(TAG_Resource_Stone_Iron, "Resource.Stone.Iron")
@@ -15,6 +15,8 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_Movement_Dash, "Ability.Movement.Dash")
 
 // GameplayCue
 UE_DEFINE_GAMEPLAY_TAG(TAG_GameplayCue_Movement_Dash, "GameplayCue.Movement.Dash")
+UE_DEFINE_GAMEPLAY_TAG(TAG_GameplayCue_Damage_Burst, "GameplayCue.Damage.Burst")
+UE_DEFINE_GAMEPLAY_TAG(TAG_GameplayCue_Heal_Burst, "GameplayCue.Heal.Burst")
 
 // Cooldown
 UE_DEFINE_GAMEPLAY_TAG(TAG_Cooldown_Dash, "Cooldown.Dash");
@@ -22,3 +24,7 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_Cooldown_Dash, "Cooldown.Dash");
 // Regen
 UE_DEFINE_GAMEPLAY_TAG(TAG_Regen_Stamina, "Regen.Stamina")
 UE_DEFINE_GAMEPLAY_TAG(TAG_Regen_Health, "Regen.Health")
+
+// Damage
+UE_DEFINE_GAMEPLAY_TAG(TAG_Data_Damage, "Data.Damage")
+UE_DEFINE_GAMEPLAY_TAG(TAG_Data_Heal, "Data.Heal")

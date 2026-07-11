@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
+#include "GameplayTagContainer.h"
 #include "LittleGameplayAbility.generated.h"
 
 /**
@@ -14,4 +15,16 @@ class LITTLERPG_API ULittleGameplayAbility : public UGameplayAbility
 
 public:
 	ULittleGameplayAbility();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability")
+	TObjectPtr<UTexture2D> AbilityIcon;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability")
+	FText AbilityDisplayName;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability")
+	FGameplayTag InputTag;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability")
+	FGameplayTag CooldownTag;
 };

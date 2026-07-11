@@ -1,4 +1,4 @@
-﻿#include "Actor/PickupObject.h"
+﻿#include "Actor/Pickup/PickupObject.h"
 
 #include "Character/LittleBaseCharacter.h"
 #include "Component/InventoryManager/LittleInventoryManagerComponent.h"
@@ -8,9 +8,8 @@
 
 APickupObject::APickupObject()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
-	SetReplicateMovement(true);
 	SetNetUpdateFrequency(10);
 	
 	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
@@ -55,6 +54,7 @@ void APickupObject::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* Other
 	ALittleBaseCharacter* Character = Cast<ALittleBaseCharacter>(OtherActor);
 	if (Character)
 	{
+		SetOwner(Character);
 		ALittlePlayerState* PlayerState = Cast<ALittlePlayerState>(Character->GetPlayerState());
 		Interact(Character);
 		if (PlayerState)

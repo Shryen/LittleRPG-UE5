@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
-#include "PickupObject.h"
+#include "Actor/Pickup/PickupObject.h"
 #include "GameFramework/Actor.h"
 #include "Equipment.generated.h"
 

@@ -22,6 +22,9 @@ class LITTLERPG_API ULittleAttributeSet : public UAttributeSet
 public:
 	ULittleAttributeSet();
 	
+	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
+	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
+	
 	// Vital
 	ATTRIBUTE_ACCESSORS(ULittleAttributeSet, Health);
 	ATTRIBUTE_ACCESSORS(ULittleAttributeSet, MaxHealth);
