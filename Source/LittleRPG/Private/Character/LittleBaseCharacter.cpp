@@ -173,6 +173,9 @@ void ALittleBaseCharacter::InitDefaultGameplayEffects()
 		AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SecondarySpecHandle.Data.Get());
 	}
 	
+	LittleAttributeSet->InitHealth(LittleAttributeSet->GetMaxHealth());
+	LittleAttributeSet->InitStamina(LittleAttributeSet->GetMaxStamina());
+	
 }
 
 void ALittleBaseCharacter::SetCharacterState(const ECharacterState NewState)

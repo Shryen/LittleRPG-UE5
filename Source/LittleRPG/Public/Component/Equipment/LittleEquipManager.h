@@ -1,13 +1,17 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "Actor/Equipment/Equipment.h"
 #include "Components/ActorComponent.h"
+#include "GameplayEffectTypes.h"
 #include "Data/Equipment/EquipmentDisplayPayLoad.h"
 #include "LittleEquipManager.generated.h"
 
-
+class UGameplayEffect;
 class ULittleInventoryManagerComponent;
 class ALittlePlayerState;
+class UAbilitySystemComponent;
+struct FItemDataRow;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class LITTLERPG_API ULittleEquipManager : public UActorComponent
@@ -15,13 +19,14 @@ class LITTLERPG_API ULittleEquipManager : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	ULittleEquipManager();
-	
 	UFUNCTION()
 	void OnEquipmentChanged(const FEquipmentDisplayPayload& EquipmentDisplayPayload);
 	
-protected:
 	virtual void BeginPlay() override;
+
+protected:
+	UPROPERTY()
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 	
 private:
 	// PlayerState
@@ -30,10 +35,15 @@ private:
 	UFUNCTION()
 	void OnPlayerStateReady();
 	bool SetupPlayerState();
-	
+	FItemDataRow* GetRowFromDataTable(FName ItemRowName) const;
+	AEquipment* DefferEquipment(const FItemDataRow* Row) const;
+	void AttachToMesh(EEquipmentSlot Slot, const FItemDataRow* Row, AEquipment* Equipment) const;
+
 	// Equipment
 	UPROPERTY()
 	TMap<EEquipmentSlot, TObjectPtr<AActor>> SpawnedEquipment;
+	
+	TMap<EEquipmentSlot, TArray<FActiveGameplayEffectHandle>> ActiveGameplayEffects;
 	
 	void DestroyEquippedActor(EEquipmentSlot Slot);
 	AActor* SpawnEquippedActor(EEquipmentSlot Slot, FName ItemRowName);
@@ -44,5 +54,4 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Little|Animation")
 	TSubclassOf<UAnimInstance> UnarmedAnimClass;
-	
 };
