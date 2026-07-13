@@ -19,8 +19,6 @@ void ULittleAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (!Character || !MovementComponent)
 		return;
 	
-	CharacterState = Character->GetCharacterState();
-	
 	Velocity = MovementComponent->Velocity;
 	Speed = Velocity.Size2D();
 	

@@ -4,29 +4,63 @@
 #include "Character/LittleBaseCharacter.h"
 #include "Component/InventoryManager/LittleInventoryManagerComponent.h"
 #include "Data/Inventory/ItemDataRow.h"
+#include "Net/UnrealNetwork.h"
 #include "PlayerState/LittlePlayerState.h"
 
-void ULittleEquipManager::OnEquipmentChanged(const FEquipmentDisplayPayload& Payload)
+ULittleEquipManager::ULittleEquipManager()
 {
-	DestroyEquippedActor(Payload.SlotType);
+	SetIsReplicatedByDefault(true);
+}
+
+void ULittleEquipManager::OnEquipmentChanged(const FEquipmentDisplayPayload& EquipmentDisplayPayload)
+{
+	if (!GetOwner()->HasAuthority()) return;
+	DestroyEquippedActor(EquipmentDisplayPayload.SlotType);
 	
 	ALittleBaseCharacter* BaseCharacter = Cast<ALittleBaseCharacter>(GetOwner());
 	if (!BaseCharacter || !BaseCharacter->GetMesh()) return;
 	
-	if (Payload.ItemRowName.IsNone())
+	if (EquipmentDisplayPayload.ItemRowName.IsNone())
 	{
-		if (Payload.SlotType == EEquipmentSlot::Weapon && UnarmedAnimClass)
-			BaseCharacter->GetMesh()->SetAnimInstanceClass(UnarmedAnimClass);
+		if (EquipmentDisplayPayload.SlotType == EEquipmentSlot::Weapon && UnarmedAnimClass)
+			UpdateAnimInstanceClass(UnarmedAnimClass);
+			//BaseCharacter->GetMesh()->SetAnimInstanceClass(UnarmedAnimClass);
 		return; 
 	}
 	
-	AActor* NewActor = SpawnEquippedActor(Payload.SlotType, Payload.ItemRowName);
+	AActor* NewActor = SpawnEquippedActor(EquipmentDisplayPayload.SlotType, EquipmentDisplayPayload.ItemRowName);
 	if (!NewActor) return;
 	
-	SpawnedEquipment.Add(Payload.SlotType, NewActor);
+	SpawnedEquipment.Add(EquipmentDisplayPayload.SlotType, NewActor);
 	ALittleWeaponBase* Weapon = Cast<ALittleWeaponBase>(NewActor);
-	if (Payload.SlotType == EEquipmentSlot::Weapon && Weapon && Weapon->WeaponAnimClass)
-		BaseCharacter->GetMesh()->SetAnimInstanceClass(Weapon->WeaponAnimClass);
+	if (EquipmentDisplayPayload.SlotType == EEquipmentSlot::Weapon && Weapon && Weapon->WeaponAnimClass)
+		UpdateAnimInstanceClass(Weapon->WeaponAnimClass);
+		//BaseCharacter->GetMesh()->SetAnimInstanceClass(Weapon->WeaponAnimClass);
+	
+}
+
+void ULittleEquipManager::UpdateAnimInstanceClass(TSubclassOf<UAnimInstance> NewClass)
+{
+	CurrentAnimInstanceClass = NewClass;
+	OnRep_AnimInstance(CurrentAnimInstanceClass);
+}
+
+
+
+void ULittleEquipManager::OnRep_AnimInstance(TSubclassOf<UAnimInstance> OldAnimInstance) const
+{
+	if (CurrentAnimInstanceClass == nullptr) return;
+	
+	ALittleBaseCharacter* BaseCharacter = Cast<ALittleBaseCharacter>(GetOwner());
+	if (!BaseCharacter || !BaseCharacter->GetMesh()) return;
+	USkeletalMeshComponent* Mesh = BaseCharacter->GetMesh();
+	Mesh->SetAnimInstanceClass(CurrentAnimInstanceClass);
+}
+
+void ULittleEquipManager::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ULittleEquipManager, CurrentAnimInstanceClass);
 }
 
 void ULittleEquipManager::BeginPlay()
@@ -153,4 +187,3 @@ FName ULittleEquipManager::GetDefaultSocket(const EEquipmentSlot Slot) const
 	default:                       return NAME_None;
 	}
 }
-

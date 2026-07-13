@@ -79,16 +79,6 @@ void ALittleBaseCharacter::OnRep_PlayerState()
 	OnPlayerStateReady.Broadcast();
 }
 
-void ALittleBaseCharacter::OnRep_CharacterState()
-{
-	
-}
-
-void ALittleBaseCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(ALittleBaseCharacter, CharacterState);
-}
 
 void ALittleBaseCharacter::OnHealthChanged(const FOnAttributeChangeData& Data)
 {
@@ -178,13 +168,7 @@ void ALittleBaseCharacter::InitDefaultGameplayEffects()
 	
 }
 
-void ALittleBaseCharacter::SetCharacterState(const ECharacterState NewState)
-{
-	CharacterState = NewState;
-}
-
 void ALittleBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
-

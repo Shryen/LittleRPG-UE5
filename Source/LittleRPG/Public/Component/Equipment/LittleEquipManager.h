@@ -19,8 +19,12 @@ class LITTLERPG_API ULittleEquipManager : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	UFUNCTION()
+	ULittleEquipManager();
+	
+	void UpdateAnimInstanceClass(TSubclassOf<UAnimInstance> NewClass);
 	void OnEquipmentChanged(const FEquipmentDisplayPayload& EquipmentDisplayPayload);
+	
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	
 	virtual void BeginPlay() override;
 
@@ -54,4 +58,10 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Little|Animation")
 	TSubclassOf<UAnimInstance> UnarmedAnimClass;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Little|Animation", ReplicatedUsing = OnRep_AnimInstance)
+	TSubclassOf<UAnimInstance> CurrentAnimInstanceClass;
+	
+	UFUNCTION()
+	void OnRep_AnimInstance(TSubclassOf<UAnimInstance> OldAnimInstance) const;
 };

@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
-#include "Data/CharacterState/ECharacterState.h"
 #include "LittleAnimInstance.generated.h"
 
 class ALittleBaseCharacter;
@@ -42,6 +41,4 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "LittleAnimInstance")
 	bool bIsFalling;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "LittleAnimInstance")
-	ECharacterState CharacterState = ECharacterState::Unarmed;
 };
