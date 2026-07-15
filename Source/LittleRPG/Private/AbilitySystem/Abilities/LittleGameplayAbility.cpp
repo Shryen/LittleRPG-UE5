@@ -3,5 +3,4 @@
 ULittleGameplayAbility::ULittleGameplayAbility()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
-	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
 }

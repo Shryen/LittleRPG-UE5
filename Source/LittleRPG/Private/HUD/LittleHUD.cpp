@@ -5,6 +5,7 @@
 #include "HUD/Widget/LittleWidgetController.h"
 #include "HUD/Widget/MainLayoutWidget.h"
 #include "HUD/Widget/MainLayoutWidgetController.h"
+#include "HUD/Widget/AbilityBar/AbilityBarWidgetController.h"
 #include "HUD/Widget/Crafting/CraftingWidget.h"
 #include "HUD/Widget/Crafting/CraftingWidgetController.h"
 #include "HUD/Widget/Inventory/InventoryWidget.h"
@@ -67,6 +68,13 @@ void ALittleHUD::SetupCraftingWidgetController(FWidgetControllerParams Params)
 	CraftingWidgetController->SetWidget(MainOverlayWidget->CraftingWidget);
 }
 
+void ALittleHUD::SetupAbilityBarController(FWidgetControllerParams Params)
+{
+	AbilityBarController = NewObject<UAbilityBarWidgetController>(this);
+	AbilityBarController->SetWidgetControllerParams(Params);
+	AbilityBarController->SetWidget(MainOverlayWidget->AbilityBarWidget);
+}
+
 void ALittleHUD::SetupPlayerStateDependencies()
 {
 	ALittleBaseCharacter* Character = Cast<ALittleBaseCharacter>(GetOwningPawn());
@@ -99,11 +107,13 @@ void ALittleHUD::BeginPlay()
 	SetupHealthBarWidgetController(Params);
 	SetupStaminaBarWidgetController(Params);
 	SetupCraftingWidgetController(Params);
+	SetupAbilityBarController(Params);
 	
 	MainOverlayWidget->InventoryWidget->SetWidgetController(InventoryWidgetController);
 	MainOverlayWidget->VitalBarsWidget->HealthBarWidget->SetWidgetController(HealthBarWidgetController);
 	MainOverlayWidget->VitalBarsWidget->StaminaBarWidget->SetWidgetController(StaminaBarWidgetController);
 	MainOverlayWidget->CraftingWidget->SetWidgetController(CraftingWidgetController);
+	MainOverlayWidget->AbilityBarWidget->SetWidgetController(AbilityBarController);
 	
 	SetupPlayerStateDependencies();
 }
@@ -117,5 +127,5 @@ void ALittleHUD::OnPlayerStateReady()
 	InventoryWidgetController->BindDependencies();
 	InventoryWidgetController->BindStatAttributes();
 	CraftingWidgetController->BindDependencies();
-	
+	AbilityBarController->BindDependencies();
 }

@@ -3,4 +3,5 @@
 void ULittleUserWidget::SetWidgetController(UObject* InWidgetController)
 {
 	WidgetController = InWidgetController;
+	ControllerSet();
 }

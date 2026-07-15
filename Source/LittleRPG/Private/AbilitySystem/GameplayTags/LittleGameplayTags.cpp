@@ -12,6 +12,12 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_Equipment_UnEquipped, "Equipment.UnEquipped")
 
 // Ability
 UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_Movement_Dash, "Ability.Movement.Dash")
+UE_DEFINE_GAMEPLAY_TAG(TAG_Ability_Melee_AutoAttack, "Ability.Melee.AutoAttack")
+
+// Event
+UE_DEFINE_GAMEPLAY_TAG(TAG_Event_Abilities_Changed, "Event.Abilities.Changed")
+UE_DEFINE_GAMEPLAY_TAG(TAG_Event_HitScan_Start, "Event.HitScan.Start")
+UE_DEFINE_GAMEPLAY_TAG(TAG_Event_HitScan_End, "Event.HitScan.End")
 
 // GameplayCue
 UE_DEFINE_GAMEPLAY_TAG(TAG_GameplayCue_Movement_Dash, "GameplayCue.Movement.Dash")

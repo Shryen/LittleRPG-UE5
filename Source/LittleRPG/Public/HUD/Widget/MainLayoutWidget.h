@@ -39,4 +39,7 @@ public:
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UVitalBars> VitalBarsWidget;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<ULittleUserWidget> AbilityBarWidget;
 };

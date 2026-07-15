@@ -17,7 +17,6 @@ void ULittleEquipManager::OnEquipmentChanged(const FEquipmentDisplayPayload& Equ
 	if (!GetOwner()->HasAuthority()) return;
 	DestroyEquippedActor(EquipmentDisplayPayload.SlotType);
 	
-	ALittleBaseCharacter* BaseCharacter = Cast<ALittleBaseCharacter>(GetOwner());
 	if (!BaseCharacter || !BaseCharacter->GetMesh()) return;
 	
 	if (EquipmentDisplayPayload.ItemRowName.IsNone())
@@ -33,8 +32,10 @@ void ULittleEquipManager::OnEquipmentChanged(const FEquipmentDisplayPayload& Equ
 	
 	SpawnedEquipment.Add(EquipmentDisplayPayload.SlotType, NewActor);
 	ALittleWeaponBase* Weapon = Cast<ALittleWeaponBase>(NewActor);
-	if (EquipmentDisplayPayload.SlotType == EEquipmentSlot::Weapon && Weapon && Weapon->WeaponAnimClass)
-		UpdateAnimInstanceClass(Weapon->WeaponAnimClass);
+	FItemDataRow* Row = GetRowFromDataTable(EquipmentDisplayPayload.ItemRowName);
+	if (!Row) return;
+	if (EquipmentDisplayPayload.SlotType == EEquipmentSlot::Weapon && Weapon && Row->EquipmentConfig.AnimInstance)
+		UpdateAnimInstanceClass(Row->EquipmentConfig.AnimInstance);
 		//BaseCharacter->GetMesh()->SetAnimInstanceClass(Weapon->WeaponAnimClass);
 	
 }
@@ -45,13 +46,9 @@ void ULittleEquipManager::UpdateAnimInstanceClass(TSubclassOf<UAnimInstance> New
 	OnRep_AnimInstance(CurrentAnimInstanceClass);
 }
 
-
-
 void ULittleEquipManager::OnRep_AnimInstance(TSubclassOf<UAnimInstance> OldAnimInstance) const
 {
 	if (CurrentAnimInstanceClass == nullptr) return;
-	
-	ALittleBaseCharacter* BaseCharacter = Cast<ALittleBaseCharacter>(GetOwner());
 	if (!BaseCharacter || !BaseCharacter->GetMesh()) return;
 	USkeletalMeshComponent* Mesh = BaseCharacter->GetMesh();
 	Mesh->SetAnimInstanceClass(CurrentAnimInstanceClass);
@@ -66,16 +63,24 @@ void ULittleEquipManager::GetLifetimeReplicatedProps(TArray<class FLifetimePrope
 void ULittleEquipManager::BeginPlay()
 {
 	Super::BeginPlay();
-	ALittleBaseCharacter* BaseCharacter = Cast<ALittleBaseCharacter>(GetOwner());
+	BaseCharacter = Cast<ALittleBaseCharacter>(GetOwner());
 	AbilitySystemComponent = BaseCharacter ? BaseCharacter->GetAbilitySystemComponent() : nullptr;
 	check(AbilitySystemComponent);
 	if (!SetupPlayerState()) return;
 }
 
+ALittleWeaponBase* ULittleEquipManager::GetEquippedWeapon()
+{
+	TObjectPtr<AActor>* Equipment = SpawnedEquipment.Find(EEquipmentSlot::Weapon);
+	if (!Equipment || !*Equipment) return nullptr;
+	
+	ALittleWeaponBase* Weapon = Cast<ALittleWeaponBase>(*Equipment);
+	return Weapon;
+}
+
 void ULittleEquipManager::OnPlayerStateReady()
 {
 	if (InventoryManager) return;
-	ALittleBaseCharacter* BaseCharacter = Cast<ALittleBaseCharacter>(GetOwner());
 	LittlePlayerState = Cast<ALittlePlayerState>(BaseCharacter->GetPlayerState());
 	
 	InventoryManager = LittlePlayerState->GetInventoryManager();
@@ -84,7 +89,6 @@ void ULittleEquipManager::OnPlayerStateReady()
 
 bool ULittleEquipManager::SetupPlayerState()
 {
-	ALittleBaseCharacter* BaseCharacter = Cast<ALittleBaseCharacter>(GetOwner());
 	if (!BaseCharacter) { UE_LOG(LogTemp, Error, TEXT("ULittleEquipManager::BeginPlay: Owner is not BaseCharacter.")); return false;}
 	
 	BaseCharacter->OnPlayerStateReady.AddUObject(this, &ULittleEquipManager::OnPlayerStateReady);
@@ -104,10 +108,12 @@ FItemDataRow* ULittleEquipManager::GetRowFromDataTable(FName ItemRowName) const
 
 AEquipment* ULittleEquipManager::DefferEquipment(const FItemDataRow* Row) const
 {
+	APawn* Instigator = Cast<APawn>(GetOwner());
 	AEquipment* Equipment = GetWorld()->SpawnActorDeferred<AEquipment>(
 		Row->ItemClass,
 		FTransform::Identity,
-		GetOwner()
+		GetOwner(),
+		Instigator
 	);
 	return Equipment;
 }
@@ -116,7 +122,6 @@ void ULittleEquipManager::AttachToMesh(const EEquipmentSlot Slot, const FItemDat
 {
 	if (!Row || !Equipment) return;
 	FName Socket = Row->AttachmentSocket.IsNone() ? GetDefaultSocket(Slot) : Row->AttachmentSocket;
-	ALittleBaseCharacter* BaseCharacter = Cast<ALittleBaseCharacter>(GetOwner());
 	checkf(BaseCharacter, TEXT("BaseCharacter not found when trying to attach to it's mesh"));
 	Equipment->AttachToComponent(BaseCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, Socket);
 }
@@ -137,8 +142,38 @@ void ULittleEquipManager::DestroyEquippedActor(const EEquipmentSlot Slot)
 			(*Found)->Destroy();
 		SpawnedEquipment.Remove(Slot);
 	}
+	
+	RemoveAbilitiesGrantedFromEquipment();
 }
 
+void ULittleEquipManager::ApplyGameplayEffectFromEquipment(const EEquipmentSlot Slot, FItemDataRow* Row, const AEquipment* Equipment)
+{
+	FGameplayEffectContextHandle ContextHandle = AbilitySystemComponent->MakeEffectContext();
+	ContextHandle.AddSourceObject(Equipment);
+	for (const TSubclassOf<UGameplayEffect>& GE : Row->EquipmentConfig.EffectsToGrant)
+	{
+		FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(GE, 1, ContextHandle);
+		if (SpecHandle.IsValid())
+		{
+			FActiveGameplayEffectHandle ActiveHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+			ActiveGameplayEffects.FindOrAdd(Slot).Add(ActiveHandle);
+		}
+	}
+}
+
+TArray<FGameplayAbilitySpecHandle> ULittleEquipManager::GrantAbilitiesFromEquipment(const FItemDataRow* Row)
+{
+	if (!BaseCharacter) return TArray<FGameplayAbilitySpecHandle>();
+	GrantedAbilities = BaseCharacter->GrantAbilities(Row->EquipmentConfig.AbilitiesToGrant);
+	return GrantedAbilities;
+}
+
+void ULittleEquipManager::RemoveAbilitiesGrantedFromEquipment()
+{
+	if (!BaseCharacter) return;
+	BaseCharacter->RemoveAbilities(GrantedAbilities);
+	GrantedAbilities.Empty();
+}
 
 AActor* ULittleEquipManager::SpawnEquippedActor(const EEquipmentSlot Slot, const FName ItemRowName)
 {
@@ -157,17 +192,9 @@ AActor* ULittleEquipManager::SpawnEquippedActor(const EEquipmentSlot Slot, const
 	Equipment->FinishSpawning(FTransform::Identity);
 	AttachToMesh(Slot, Row, Equipment);
 	
-	FGameplayEffectContextHandle ContextHandle = AbilitySystemComponent->MakeEffectContext();
-	ContextHandle.AddSourceObject(Equipment);
-	for (const TSubclassOf<UGameplayEffect>& GE : Row->GivenStats)
-	{
-		FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(GE, 1, ContextHandle);
-		if (SpecHandle.IsValid())
-		{
-			FActiveGameplayEffectHandle ActiveHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-			ActiveGameplayEffects.FindOrAdd(Slot).Add(ActiveHandle);
-		}
-	}
+	ApplyGameplayEffectFromEquipment(Slot, Row, Equipment);
+	GrantAbilitiesFromEquipment(Row);
+	
 	return Equipment;
 }
 

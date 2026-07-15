@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "LittleBaseCharacter.generated.h"
 
+class ULittleAbilitySystemComponent;
 class ULittleAttributeSet;
 enum class EGameplayEffectReplicationMode;
 class ULittleEquipManager;
@@ -28,8 +29,6 @@ public:
 	
 	USceneComponent* GetLightMagicSceneComponent() const {return LightMagicSceneComponent;}
 	
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-
 	virtual void BeginPlay() override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
@@ -37,6 +36,18 @@ public:
 	void OnHealthChanged(const FOnAttributeChangeData& Data);
 	void BindDependencies();
 	void OnStaminaChanged(const FOnAttributeChangeData& Data);
+	
+	// ASC
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	
+	UFUNCTION(BlueprintCallable, Category = "Little|AbilitySystem|Abilities")
+	TArray<FGameplayAbilitySpecHandle> GrantAbilities(TArray<TSubclassOf<UGameplayAbility>> AbilitiesToGrant);
+	
+	UFUNCTION(BlueprintCallable, Category = "Little|AbilitySystem|Abilities")
+	void RemoveAbilities(TArray<FGameplayAbilitySpecHandle> AbilitiesToRemove);
+	
+	UFUNCTION(BlueprintCallable, Category = "Little|AbilitySystem|Abilities")
+	void SendAbilitiesChangedEvent();
 	
 	void InitDefaultGameplayEffects();
 	
@@ -49,7 +60,7 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="AbilitySystem")
-	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+	TObjectPtr<ULittleAbilitySystemComponent> AbilitySystemComponent;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AbilitySystem")
 	TObjectPtr<ULittleAttributeSet> LittleAttributeSet;
@@ -65,7 +76,7 @@ private:
 	TObjectPtr<ULittleEquipManager> EquipManager;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "AbilitySystem")
-	TArray<TSubclassOf<UGameplayAbility>> GivenAbilities;
+	TArray<TSubclassOf<UGameplayAbility>> StartingAbilities;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "AbilitySystem")
 	TSubclassOf<UGameplayEffect> InitialGameplayEffects;

@@ -17,6 +17,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetWidgetController(UObject* InWidgetController);
 	
+	UFUNCTION(BlueprintImplementableEvent)
+	void ControllerSet();
+	
 	UPROPERTY(BlueprintReadOnly, Category = "LittleRPG|Widget|Controller")
 	TObjectPtr<UObject> WidgetController;
 }; 

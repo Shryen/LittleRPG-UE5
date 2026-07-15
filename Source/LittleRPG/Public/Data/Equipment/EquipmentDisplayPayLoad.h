@@ -14,5 +14,5 @@ struct FEquipmentDisplayPayload
 	UPROPERTY(BlueprintReadOnly) FName ItemRowName;
 
 	UPROPERTY(BlueprintReadOnly) FText ItemName;
-	UPROPERTY(BlueprintReadOnly) TSoftObjectPtr<UTexture2D> ItemIcon = nullptr;
+	UPROPERTY(BlueprintReadOnly) TObjectPtr<UTexture2D> ItemIcon = nullptr;
 };

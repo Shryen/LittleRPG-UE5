@@ -2,9 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "Actor/Pickup/PickupObject.h"
+#include "Data/Equipment/EquipmentConfig.h"
 #include "GameFramework/Actor.h"
 #include "Equipment.generated.h"
 
+struct FEquipmentConfig;
 class UBoxComponent;
 
 UCLASS()

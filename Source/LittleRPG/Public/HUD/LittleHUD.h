@@ -6,6 +6,7 @@
 #include "LittleHUD.generated.h"
 
 
+class UAbilityBarWidgetController;
 class UCraftingWidgetController;
 class UProgressBarWidgetController;
 class UMainLayoutWidget;
@@ -26,6 +27,7 @@ public:
 	UProgressBarWidgetController* GetStaminaBarWidgetController() const { return StaminaBarWidgetController; }
 	UMainLayoutWidgetController* GetMainLayoutWidgetController() const { return MainLayoutWidgetController; }
 	UCraftingWidgetController* GetCraftingWidgetController() const { return CraftingWidgetController; }
+	UAbilityBarWidgetController* GetAbilityBarController() const { return AbilityBarController; }
 	
 protected:
 	bool SetupMainOverlayWidget(APlayerController* PC);
@@ -34,6 +36,7 @@ protected:
 	void SetupHealthBarWidgetController(FWidgetControllerParams Params);
 	void SetupStaminaBarWidgetController(FWidgetControllerParams Params);
 	void SetupCraftingWidgetController(FWidgetControllerParams Params);
+	void SetupAbilityBarController(FWidgetControllerParams Params);
 	void SetupPlayerStateDependencies();
 	virtual void BeginPlay() override;
 	void OnPlayerStateReady();
@@ -52,6 +55,8 @@ private:
 	TObjectPtr<UProgressBarWidgetController> StaminaBarWidgetController;
 	UPROPERTY()
 	TObjectPtr<UCraftingWidgetController> CraftingWidgetController;
+	UPROPERTY()
+	TObjectPtr<UAbilityBarWidgetController> AbilityBarController;
 	
 	UPROPERTY()
 	TObjectPtr<UMainLayoutWidget> MainOverlayWidget;

@@ -27,4 +27,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability")
 	FGameplayTag CooldownTag;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability")
+	bool bShouldShowInAbilityBar = false;
 };
