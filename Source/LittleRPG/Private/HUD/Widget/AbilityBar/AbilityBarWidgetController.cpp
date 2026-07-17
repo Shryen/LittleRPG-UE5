@@ -45,7 +45,7 @@ void UAbilityBarWidgetController::RefreshAbilities()
 		Slot.InputTag = Ability->InputTag;
 		Slot.CooldownTag = Ability->CooldownTag;
 		Slot.SpecHandle = Spec.Handle;
-		Slot.bShouldShowInBar = Ability->bShouldShowInAbilityBar;
+		Slot.bShouldShowInBar = Ability->bShouldShowInAbilityBar; 
 		
 		Slots.Add(Slot);
 	}

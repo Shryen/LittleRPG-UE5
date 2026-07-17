@@ -42,6 +42,15 @@ UAbilitySystemComponent* ALittleBaseCharacter::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
+void ALittleBaseCharacter::Server_SendGameplayEventToSelf_Implementation(FGameplayEventData EventData)
+{
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+		this,
+		EventData.EventTag,
+		EventData
+	);
+}
+
 void ALittleBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();

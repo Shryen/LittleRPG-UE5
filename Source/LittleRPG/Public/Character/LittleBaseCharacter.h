@@ -22,10 +22,26 @@ public:
 	ALittleBaseCharacter();
 	virtual void Tick(float DeltaTime) override;
 	
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Little|Abilities")
+	const FGameplayTag& GetAutoAttackTag() const 
+	{ 
+		UE_LOG(LogTemp, Warning, TEXT("AttackTag got from BaseCharacter %s"), *AutoAttackTag.ToString())
+		return AutoAttackTag; 
+	}
+	
+	void SetAutoAttackTag(const FGameplayTag& NewTag)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AttackTag been set for BaseCharacter: %s"), *NewTag.ToString())
+		AutoAttackTag = NewTag;
+	}
+	
+	UFUNCTION(BlueprintCallable, Category="Little")
 	FVector GetLastDirection() const { return GetLastMovementInputVector(); }
 	
 	FOnPlayerStateReadySignature OnPlayerStateReady;
+	
+	UFUNCTION(BlueprintCallable, Category = "Little|AbilitySystem", Server, Reliable)
+	void Server_SendGameplayEventToSelf(FGameplayEventData EventData);
 	
 	USceneComponent* GetLightMagicSceneComponent() const {return LightMagicSceneComponent;}
 	
@@ -53,19 +69,19 @@ public:
 	
 	ULittleAttributeSet* GetLittleAttributeSet() { return LittleAttributeSet; };
 	
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "Little|AbilitySystem|Effects")
 	TSubclassOf<UGameplayEffect> GE_StaminaRegen;
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "Little|AbilitySystem|Effects")
 	TSubclassOf<UGameplayEffect> GE_HealthRegen;
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="AbilitySystem")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Little|AbilitySystem")
 	TObjectPtr<ULittleAbilitySystemComponent> AbilitySystemComponent;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AbilitySystem")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Little|AbilitySystem")
 	TObjectPtr<ULittleAttributeSet> LittleAttributeSet;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AbilitySystem")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Little|AbilitySystem")
 	EGameplayEffectReplicationMode AscReplicationMode = EGameplayEffectReplicationMode::Mixed;
 	
 private:
@@ -75,13 +91,15 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<ULittleEquipManager> EquipManager;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "AbilitySystem")
+	UPROPERTY(EditDefaultsOnly, Category = "Little|AbilitySystem|Starting")
 	TArray<TSubclassOf<UGameplayAbility>> StartingAbilities;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "AbilitySystem")
+	UPROPERTY(EditDefaultsOnly, Category = "Little|AbilitySystem|Starting")
 	TSubclassOf<UGameplayEffect> InitialGameplayEffects;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "AbilitySystem")
+	UPROPERTY(EditDefaultsOnly, Category = "Little|AbilitySystem|Starting")
 	TSubclassOf<UGameplayEffect> InitialSecondaryGameplayEffects;
 	
+	UPROPERTY(EditDefaultsOnly, Category = "Little|AbilitySystem")
+	FGameplayTag AutoAttackTag;
 };

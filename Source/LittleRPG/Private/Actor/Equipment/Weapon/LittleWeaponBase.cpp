@@ -1,7 +1,5 @@
 ﻿#include "Actor/Equipment/Weapon/LittleWeaponBase.h"
-
 #include "KismetTraceUtils.h"
-#include "AbilitySystem/LittleAbilitySystemComponent.h"
 #include "Character/LittleBaseCharacter.h"
 
 
@@ -38,16 +36,6 @@ void ALittleWeaponBase::HitScan(TArray<FHitResult>& OutHit, bool& bWasHit)
 		ECC_Visibility,
 		WeaponSphere,
 		Params
-	);
-
-	DrawDebugSweptSphere(
-		GetWorld(),
-		TraceStart->GetComponentLocation(),
-		TraceEnd->GetComponentLocation(),
-		HitScanRadius,
-		FColor::Red,
-		false,
-		1.f
 	);
 
 	for (const FHitResult& Hit : SweepHits)

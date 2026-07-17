@@ -5,6 +5,8 @@
 #include "GameFramework/PlayerController.h"
 #include "LittlePlayerController.generated.h"
 
+class ALittleBaseCharacter;
+class ULittleAbilitySystemComponent;
 class AResourceNode;
 class UInputAction;
 class UInputMappingContext;
@@ -35,29 +37,35 @@ protected:
 	TMap<FGameplayTag, TSubclassOf<AResourceNode>> ResourceNodeClassMap;
 
 private:
+	UPROPERTY()
+	TObjectPtr<ULittleAbilitySystemComponent> LittleASC;
+	
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Jump(const FInputActionValue& Value);
 	void StopJump(const FInputActionValue& Value);
 	void HandleInventory(const FInputActionValue& Value);
 	void HandleInteract(const FInputActionValue& Value);
+	void Attack(const FInputActionValue& Value);
 	
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UInputMappingContext> MovementMappingContext;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UPROPERTY(EditDefaultsOnly, Category = "Little|Input")
 	TObjectPtr<UInputAction> MoveAction;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UPROPERTY(EditDefaultsOnly, Category = "Little|Input")
 	TObjectPtr<UInputAction> LookAction;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UPROPERTY(EditDefaultsOnly, Category = "Little|Input")
 	TObjectPtr<UInputAction> JumpAction;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UPROPERTY(EditDefaultsOnly, Category = "Little|Input")
 	TObjectPtr<UInputAction> InventoryAction;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UPROPERTY(EditDefaultsOnly, Category = "Little|Input")
 	TObjectPtr<UInputAction> InteractAction;
 	
+	UPROPERTY(EditDefaultsOnly, Category = "Little|Input")
+	TObjectPtr<UInputAction> AttackAction;
 };

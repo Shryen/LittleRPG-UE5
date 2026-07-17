@@ -35,8 +35,6 @@ protected:
 	
 	UPROPERTY(EditAnywhere)
 	float HitScanRadius = 20.f;
-	
-
 private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Little|Weapon")

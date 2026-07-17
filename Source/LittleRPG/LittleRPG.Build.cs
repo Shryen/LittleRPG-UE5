@@ -10,7 +10,7 @@ public class LittleRPG : ModuleRules
 	
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", 
 			"Engine", "InputCore", "EnhancedInput", "UMG", 
-			"GameplayTags", "DLSS", "NetCore", "GameplayTasks", "GameplayAbilities" });
+			"GameplayTags", "DLSS", "NetCore", "GameplayTasks", "GameplayAbilities", "Niagara" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] { "AnimGraphRuntime" });
 

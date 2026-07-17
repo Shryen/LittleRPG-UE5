@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "GameplayTags.h"
 #include "EquipmentConfig.generated.h"
 
 class UGameplayAbility;
@@ -14,4 +15,5 @@ struct FEquipmentConfig
 	UPROPERTY(EditDefaultsOnly) TSubclassOf<UAnimInstance> AnimInstance;
 	UPROPERTY(EditDefaultsOnly) TArray<TSubclassOf<UGameplayAbility>> AbilitiesToGrant;
 	UPROPERTY(EditDefaultsOnly) TArray<TSubclassOf<UGameplayEffect>> EffectsToGrant;
+	UPROPERTY(EditDefaultsOnly) FGameplayTag AutoAttackTag;
 };

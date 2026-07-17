@@ -1,10 +1,13 @@
 #include "Controller/PlayerController/LittlePlayerController.h"
+#include "AbilitySystemBlueprintLibrary.h"
 #include "GameFramework/Pawn.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
+#include "AbilitySystem/GameplayTags/LittleGameplayTags.h"
 #include "Actor/Interactable/InteractableObject.h"
 #include "Actor/Resource/ResourceNode.h"
+#include "Character/LittleBaseCharacter.h"
 #include "Components/InstancedStaticMeshComponent.h"
 #include "HUD/LittleHUD.h"
 #include "HUD/Widget/MainLayoutWidgetController.h"
@@ -59,6 +62,8 @@ void ALittlePlayerController::SetupInputComponent()
 	EnhancedInput->BindAction(JumpAction, ETriggerEvent::Completed,this, &ALittlePlayerController::StopJump);
 	EnhancedInput->BindAction(InventoryAction, ETriggerEvent::Triggered,this, &ALittlePlayerController::HandleInventory);
 	EnhancedInput->BindAction(InteractAction, ETriggerEvent::Started, this, &ALittlePlayerController::HandleInteract);
+	EnhancedInput->BindAction(AttackAction, ETriggerEvent::Started, this, &ALittlePlayerController::Attack);
+	
 }
 
 void ALittlePlayerController::Server_InteractAndSwap_Implementation(UInstancedStaticMeshComponent* Component,
@@ -213,6 +218,25 @@ void ALittlePlayerController::HandleInteract(const FInputActionValue& Value)
 		}
 	}
 	Server_Interact(Hit.GetActor());
+}
+
+void ALittlePlayerController::Attack(const FInputActionValue& Value)
+{
+	ALittleBaseCharacter* BaseCharacter = Cast<ALittleBaseCharacter>(GetPawn());
+	if (!BaseCharacter) return;
+	FGameplayEventData EventData;
+	EventData.EventTag = TAG_Event_ContinueCombo_Input;
+	EventData.Instigator = BaseCharacter;
+	
+	const FGameplayTagContainer AttackTag =
+	FGameplayTagContainer(BaseCharacter->GetAutoAttackTag());
+	
+	UE_LOG(LogTemp, Warning, TEXT("AttackTag used in PlayerController: %s"), *AttackTag.ToString())
+	
+	BaseCharacter->GetAbilitySystemComponent()->TryActivateAbilitiesByTag(AttackTag);
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(BaseCharacter, EventData.EventTag, EventData);
+	if (!HasAuthority())
+		BaseCharacter->Server_SendGameplayEventToSelf(EventData);
 }
 
 void ALittlePlayerController::CheatAddItem(FName ItemRowName, int32 Quantity)

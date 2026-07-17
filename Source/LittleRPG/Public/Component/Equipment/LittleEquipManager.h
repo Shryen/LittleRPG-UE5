@@ -53,7 +53,6 @@ private:
 	TObjectPtr<ALittleBaseCharacter> BaseCharacter;
 
 	// Equipment
-	UPROPERTY()
 	TMap<EEquipmentSlot, TObjectPtr<AActor>> SpawnedEquipment;
 	
 	TMap<EEquipmentSlot, TArray<FActiveGameplayEffectHandle>> ActiveGameplayEffects;
@@ -68,6 +67,12 @@ private:
 	
 	TArray<FGameplayAbilitySpecHandle> GrantAbilitiesFromEquipment(const FItemDataRow* Row);
 	void RemoveAbilitiesGrantedFromEquipment();
+	
+	UPROPERTY(ReplicatedUsing=OnRep_EquippedWeapon)
+	TObjectPtr<ALittleWeaponBase> EquippedWeapon;
+	
+	UFUNCTION()
+	void OnRep_EquippedWeapon();
 
 	UPROPERTY()
 	TObjectPtr<ULittleInventoryManagerComponent> InventoryManager;

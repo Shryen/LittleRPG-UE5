@@ -22,7 +22,10 @@ void ULittleEquipManager::OnEquipmentChanged(const FEquipmentDisplayPayload& Equ
 	if (EquipmentDisplayPayload.ItemRowName.IsNone())
 	{
 		if (EquipmentDisplayPayload.SlotType == EEquipmentSlot::Weapon && UnarmedAnimClass)
+		{
+			EquippedWeapon = nullptr;
 			UpdateAnimInstanceClass(UnarmedAnimClass);
+		}
 			//BaseCharacter->GetMesh()->SetAnimInstanceClass(UnarmedAnimClass);
 		return; 
 	}
@@ -35,9 +38,12 @@ void ULittleEquipManager::OnEquipmentChanged(const FEquipmentDisplayPayload& Equ
 	FItemDataRow* Row = GetRowFromDataTable(EquipmentDisplayPayload.ItemRowName);
 	if (!Row) return;
 	if (EquipmentDisplayPayload.SlotType == EEquipmentSlot::Weapon && Weapon && Row->EquipmentConfig.AnimInstance)
+	{
+		EquippedWeapon = Weapon;
 		UpdateAnimInstanceClass(Row->EquipmentConfig.AnimInstance);
-		//BaseCharacter->GetMesh()->SetAnimInstanceClass(Weapon->WeaponAnimClass);
-	
+		UE_LOG(LogTemp, Warning, TEXT("Attack tag fetched from datatable: %s"), *Row->EquipmentConfig.AutoAttackTag.ToString());
+		BaseCharacter->SetAutoAttackTag(Row->EquipmentConfig.AutoAttackTag);
+	}
 }
 
 void ULittleEquipManager::UpdateAnimInstanceClass(TSubclassOf<UAnimInstance> NewClass)
@@ -58,6 +64,7 @@ void ULittleEquipManager::GetLifetimeReplicatedProps(TArray<class FLifetimePrope
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ULittleEquipManager, CurrentAnimInstanceClass);
+	DOREPLIFETIME(ULittleEquipManager, EquippedWeapon);
 }
 
 void ULittleEquipManager::BeginPlay()
@@ -71,11 +78,7 @@ void ULittleEquipManager::BeginPlay()
 
 ALittleWeaponBase* ULittleEquipManager::GetEquippedWeapon()
 {
-	TObjectPtr<AActor>* Equipment = SpawnedEquipment.Find(EEquipmentSlot::Weapon);
-	if (!Equipment || !*Equipment) return nullptr;
-	
-	ALittleWeaponBase* Weapon = Cast<ALittleWeaponBase>(*Equipment);
-	return Weapon;
+	return EquippedWeapon;
 }
 
 void ULittleEquipManager::OnPlayerStateReady()
@@ -173,6 +176,10 @@ void ULittleEquipManager::RemoveAbilitiesGrantedFromEquipment()
 	if (!BaseCharacter) return;
 	BaseCharacter->RemoveAbilities(GrantedAbilities);
 	GrantedAbilities.Empty();
+}
+
+void ULittleEquipManager::OnRep_EquippedWeapon()
+{
 }
 
 AActor* ULittleEquipManager::SpawnEquippedActor(const EEquipmentSlot Slot, const FName ItemRowName)
